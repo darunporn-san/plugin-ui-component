@@ -5,6 +5,12 @@ import path from 'path';
 
 const main = async () => {
   try {
+    // 🔹 ตรวจสอบว่ามี interactive terminal หรือไม่
+    if (!process.stdin.isTTY) {
+      console.error('❌ Please run this script in an interactive terminal.');
+      process.exit(1);
+    }
+
     const answers = await inquirer.prompt([
       {
         type: 'list',
