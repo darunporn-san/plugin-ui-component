@@ -21,6 +21,8 @@
 ```bash
 # ติดตั้งแพ็คเกจและตั้งค่าอัตโนมัติ
 npm install ui-plugin
+
+yarn add git+https://github.com/darunporn-san/plugin-ui-component.git
 # หรือ
 # yarn add ui-plugin
 

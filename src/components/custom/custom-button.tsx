@@ -3,6 +3,7 @@ import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 import { Button, ButtonProps } from "../ui/button"
+import { VisuallyHidden } from "../ui/visually-hidden"
 import {
   Dialog,
   DialogContent,
@@ -179,11 +180,13 @@ const CustomButton = React.forwardRef<HTMLButtonElement, CustomButtonProps>(
         <Dialog open={showConfirm} onOpenChange={setShowConfirm}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              {confirmTitle && (
-                <DialogTitle id="custom-button-confirm-title">
-                  {confirmTitle}
-                </DialogTitle>
-              )}
+              <DialogTitle asChild={!confirmTitle}>
+                {confirmTitle ? (
+                  <span>{confirmTitle}</span>
+                ) : (
+                  <VisuallyHidden>Confirmation</VisuallyHidden>
+                )}
+              </DialogTitle>
               <DialogDescription id="custom-button-confirm-description">
                 {confirmMessage ?? "Are you sure you want to continue?"}
               </DialogDescription>
