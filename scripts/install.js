@@ -1,27 +1,40 @@
 #!/usr/bin/env node
-const inquirer = require('inquirer');
-const fs = require('fs');
-const path = require('path');
+import inquirer from 'inquirer';
+import fs from 'fs';
+import path from 'path';
 
-inquirer
-  .prompt([
-    {
-      type: 'list',
-      name: 'type',
-      message: 'Which application type are you installing for?',
-      choices: ['admin', 'ecommerce']
-    }
-  ])
-  .then(answers => {
-    const type = answers.type;
+async function run() {
+  try {
+    const { type } = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'type',
+        message: 'Which application type are you installing for?',
+        choices: ['admin', 'ecommerce'],
+      },
+    ]);
+
     console.log(`You selected "${type}". Configuring accordingly...`);
+
     const envFile = path.resolve(process.cwd(), '.env.local');
-    let content = fs.existsSync(envFile) ? fs.readFileSync(envFile, 'utf8') : '';
-    content += `\nAPP_TYPE=${type}\n`;
-    fs.writeFileSync(envFile, content, 'utf8');
+    const existingContent = fs.existsSync(envFile)
+      ? fs.readFileSync(envFile, 'utf8')
+      : '';
+
+    const filteredContent = existingContent
+      .split('\n')
+      .filter((line) => !line.startsWith('APP_TYPE='))
+      .join('\n')
+      .trimEnd();
+
+    const nextContent = `${filteredContent}\nAPP_TYPE=${type}\n`;
+    fs.writeFileSync(envFile, nextContent, 'utf8');
+
     console.log('✅ Done!');
-  })
-  .catch(err => {
-    console.error('Error during postinstall:', err);
+  } catch (error) {
+    console.error('Error during postinstall:', error);
     process.exit(1);
-  });
+  }
+}
+
+run();
