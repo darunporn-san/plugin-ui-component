@@ -7,17 +7,17 @@ async function run() {
     {
       type: "list",
       name: "target",
-      message: "Install for which project?",
+      message: "Install UI Plugin for which project?",
       choices: ["Admin", "Ecommerce"],
     },
   ]);
 
   fs.writeFileSync(
-    "./plugin-ui.config.json",
+    "ui-plugin.config.json",
     JSON.stringify({ target: answers.target }, null, 2)
   );
 
-  console.log(`\n✔ Installed for ${answers.target}`);
+  console.log(`\n✔ UI Plugin configured for: ${answers.target}`);
 }
 
 run();
