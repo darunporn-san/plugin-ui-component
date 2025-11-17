@@ -1,12 +1,14 @@
-// Export components
-export * from "./components/custom/custom-button"
-export * from "./components/custom/custom-input"
-export * from "./components/custom/custom-select"
-// Export utilities
-export * from "./lib/utils"
+// Re-export all common utilities and types
+export * from "./lib/utils";
 
-// Export types
-export type { CustomButtonProps } from "./components/custom/custom-button"
+// Export admin-specific components and types
+export * from "./admin";
 
-// Export styles
-import './styles/globals.css'
+// Export ecommerce-specific components and types
+export * from "./ecommerce";
+
+// Export common types
+export type { CustomButtonProps } from "./components/custom/custom-button";
+
+// Import global styles
+import './styles/globals.css';

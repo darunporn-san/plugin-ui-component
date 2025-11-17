@@ -1,3 +1,4 @@
+import { ClassValue } from 'clsx';
 import * as class_variance_authority_dist_types from 'class-variance-authority/dist/types';
 import * as React from 'react';
 import { InputHTMLAttributes } from 'react';
@@ -5,7 +6,8 @@ import { VariantProps } from 'class-variance-authority';
 import { FieldValues, Path, RegisterOptions, FieldError, Merge, FieldErrorsImpl } from 'react-hook-form';
 import * as react_jsx_runtime from 'react/jsx-runtime';
 import * as SelectPrimitive from '@radix-ui/react-select';
-import { ClassValue } from 'clsx';
+
+declare function cn(...inputs: ClassValue[]): string;
 
 declare const buttonVariants: (props?: ({
     variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | null | undefined;
@@ -100,7 +102,5 @@ declare const CustomSelect: {
     <TFieldValues extends FieldValues = FieldValues>({ name, label, labelPosition, options, placeholder, rules, error: externalError, wrapperClassName, labelClassName, errorClassName, control: externalControl, required, disabled, className, onValueChange, ...props }: CustomSelectProps<TFieldValues>): react_jsx_runtime.JSX.Element;
     displayName: string;
 };
-
-declare function cn(...inputs: ClassValue[]): string;
 
 export { CustomButton, type CustomButtonProps, CustomInput, CustomSelect, type Option as SelectOption, cn, customButtonVariants };

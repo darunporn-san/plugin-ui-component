@@ -14,7 +14,12 @@
     "watch": "tsup --watch --config tsup.config.ts",
     "lint": "eslint . --ext .ts,.tsx",
     "format": "prettier --write .",
-    "shadcn": "shadcn"
+    "shadcn": "shadcn",
+    "install:ui": "node scripts/install.js",
+    "postinstall": "node scripts/install.js"
+  },
+  "bin": {
+    "install-ui": "./scripts/install.js"
   },
   "peerDependencies": {
     "react": "^19.0.0",
