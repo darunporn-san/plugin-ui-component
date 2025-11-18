@@ -1,4 +1,3 @@
-import { ClassValue } from 'clsx';
 import * as class_variance_authority_dist_types from 'class-variance-authority/dist/types';
 import * as React from 'react';
 import { InputHTMLAttributes } from 'react';
@@ -6,8 +5,6 @@ import { VariantProps } from 'class-variance-authority';
 import { FieldValues, Path, RegisterOptions, FieldError, Merge, FieldErrorsImpl } from 'react-hook-form';
 import * as react_jsx_runtime from 'react/jsx-runtime';
 import * as SelectPrimitive from '@radix-ui/react-select';
-
-declare function cn(...inputs: ClassValue[]): string;
 
 declare const buttonVariants: (props?: ({
     variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | null | undefined;
@@ -72,7 +69,7 @@ declare const CustomInput: React.ForwardRefExoticComponent<Omit<CustomInputProps
 declare const Select: React.FC<SelectPrimitive.SelectProps>;
 
 type LabelPosition = 'top' | 'left' | 'right';
-type Option = {
+type Option$1 = {
     value: string | number;
     label: string;
     disabled?: boolean;
@@ -81,7 +78,7 @@ type CustomSelectBaseProps<TFieldValues extends FieldValues = FieldValues> = {
     name: Path<TFieldValues>;
     label?: string;
     labelPosition?: LabelPosition;
-    options: Option[];
+    options: Option$1[];
     placeholder?: string;
     rules?: RegisterOptions<TFieldValues, Path<TFieldValues>>;
     error?: string | FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
@@ -103,4 +100,17 @@ declare const CustomSelect: {
     displayName: string;
 };
 
-export { CustomButton, type CustomButtonProps, CustomInput, CustomSelect, type Option as SelectOption, cn, customButtonVariants };
+type Option = {
+    value: string;
+    label: string;
+    disabled?: boolean;
+};
+interface CheckboxGroupProps extends React.HTMLAttributes<HTMLDivElement> {
+    options: Option[];
+    value?: string[];
+    onValueChange?: (selectedValues: string[]) => void;
+    disabled?: boolean;
+    orientation?: 'horizontal' | 'vertical';
+}
+
+export { type CheckboxGroupProps, CustomButton, type CustomButtonProps, CustomInput, CustomSelect, type Option$1 as SelectOption, customButtonVariants };
