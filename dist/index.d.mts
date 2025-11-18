@@ -112,5 +112,6 @@ interface CheckboxGroupProps extends React.HTMLAttributes<HTMLDivElement> {
     disabled?: boolean;
     orientation?: 'horizontal' | 'vertical';
 }
+declare const CheckboxGroup: React.ForwardRefExoticComponent<CheckboxGroupProps & React.RefAttributes<HTMLDivElement>>;
 
-export { type CheckboxGroupProps, CustomButton, type CustomButtonProps, CustomInput, CustomSelect, type Option$1 as SelectOption, customButtonVariants };
+export { CheckboxGroup, type CheckboxGroupProps, CustomButton, type CustomButtonProps, CustomInput, CustomSelect, type Option$1 as SelectOption, customButtonVariants };
