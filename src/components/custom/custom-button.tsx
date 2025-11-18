@@ -108,7 +108,35 @@ const CustomButton = React.forwardRef<HTMLButtonElement, CustomButtonProps>(
     ref
   ) => {
     const [showConfirm, setShowConfirm] = React.useState(false)
+    const [hasErrors, setHasErrors] = React.useState<boolean>(false)
     const pendingActionRef = React.useRef<(() => void) | null>(null)
+
+    React.useEffect(() => {
+      let mounted = true
+
+      const checkErrors = async () => {
+        try {
+          if (fetchErrors) {
+            const fetched = await fetchErrors()
+            if (!mounted) return
+            setHasErrors(Boolean(fetched && Object.keys(fetched).length > 0))
+            return
+          }
+
+          setHasErrors(Boolean(errors && Object.keys(errors).length > 0))
+        } catch (err) {
+          if (!mounted) return
+          // If fetching errors fails, do not enable the button by default — keep as no-errors
+          setHasErrors(false)
+        }
+      }
+
+      checkErrors()
+
+      return () => {
+        mounted = false
+      }
+    }, [fetchErrors, errors])
 
     const handleClose = React.useCallback(() => {
       setShowConfirm(false)
@@ -135,7 +163,7 @@ const CustomButton = React.forwardRef<HTMLButtonElement, CustomButtonProps>(
 
     const handleClick = React.useCallback(
       async (event: React.MouseEvent<HTMLElement>) => {
-        if (isLoading || disabled) return
+        if (isLoading || disabled || hasErrors) return
 
         if ("persist" in event) event.persist()
 
@@ -149,7 +177,9 @@ const CustomButton = React.forwardRef<HTMLButtonElement, CustomButtonProps>(
         
         // 👉 ถ้ามี errors หรือ errors ไม่ว่าง {} → ไม่ต้องเปิด Dialog
         if (resolvedErrors && Object.keys(resolvedErrors).length > 0) {
-          onClick?.(event as React.MouseEvent<HTMLButtonElement>)
+          // If resolvedErrors exist at click-time, prevent any action (button is disabled in render),
+          // but keep existing behavior to call onClick if the consumer expects it.
+          // NOTE: we early-return to avoid confirmation dialog.
           return
         }
     
