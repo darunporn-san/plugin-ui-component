@@ -144,7 +144,7 @@ const CustomInput = React.forwardRef<
         control={control}
         rules={rules}
         render={({ field }) => {
-          const { ref: _, ...fieldProps } = field;
+          const { ref: _, value = '', ...fieldProps } = field;
 
           // Extract props that shouldn't be passed to the underlying input/textarea
           const {
@@ -166,6 +166,9 @@ const CustomInput = React.forwardRef<
                 {...fieldProps}
                 {...cleanProps}
                 id={name}
+                value={value || ''}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
                 className={cn(
                   fieldError &&
                     "border-destructive focus-visible:ring-destructive",
@@ -182,6 +185,9 @@ const CustomInput = React.forwardRef<
               {...cleanProps}
               type={type}
               id={name}
+              value={value || ''}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
               className={cn(
                 fieldError &&
                   "border-destructive focus-visible:ring-destructive",
