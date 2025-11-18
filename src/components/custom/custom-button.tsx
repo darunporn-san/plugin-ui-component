@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog"
+import type { FieldErrors } from "react-hook-form"
 
 const customButtonVariants = cva("", {
   variants: {
@@ -74,6 +75,8 @@ export interface CustomButtonProps
   confirmCancelText?: React.ReactNode
   onConfirm?: (event: React.MouseEvent<HTMLElement>) => void
   onCancel?: (event: React.MouseEvent<HTMLElement>) => void
+  errors?: any
+  fetchErrors?: () => Promise<any>
 }
 
 const CustomButton = React.forwardRef<HTMLButtonElement, CustomButtonProps>(
@@ -98,6 +101,8 @@ const CustomButton = React.forwardRef<HTMLButtonElement, CustomButtonProps>(
       onCancel,
       onClick,
       disabled,
+      errors,
+      fetchErrors,
       ...props
     },
     ref
@@ -129,27 +134,39 @@ const CustomButton = React.forwardRef<HTMLButtonElement, CustomButtonProps>(
     )
 
     const handleClick = React.useCallback(
-      (event: React.MouseEvent<HTMLElement>) => {
-        if (isLoading || disabled) {
-          return
+      async (event: React.MouseEvent<HTMLElement>) => {
+        if (isLoading || disabled) return
+
+        if ("persist" in event) event.persist()
+
+        let resolvedErrors = errors
+
+        if (fetchErrors) {
+          resolvedErrors = await fetchErrors()
         }
 
+        console.log('errors', resolvedErrors);
+        
+        // 👉 ถ้ามี errors หรือ errors ไม่ว่าง {} → ไม่ต้องเปิด Dialog
+        if (resolvedErrors && Object.keys(resolvedErrors).length > 0) {
+          onClick?.(event as React.MouseEvent<HTMLButtonElement>)
+          return
+        }
+    
         if (confirmMessage || confirmTitle) {
           event.preventDefault()
           event.stopPropagation()
-          if ("persist" in event) {
-            event.persist()
-          }
+    
           pendingActionRef.current = () => {
             onClick?.(event as React.MouseEvent<HTMLButtonElement>)
           }
           setShowConfirm(true)
           return
         }
-
+    
         onClick?.(event as React.MouseEvent<HTMLButtonElement>)
       },
-      [confirmMessage, confirmTitle, disabled, isLoading, onClick]
+      [confirmMessage, confirmTitle, disabled, fetchErrors, isLoading, errors, onClick]
     )
     
     return (

@@ -32,6 +32,8 @@ interface CustomButtonProps extends Omit<ButtonProps, 'variant' | 'size'>, Varia
     confirmCancelText?: React.ReactNode;
     onConfirm?: (event: React.MouseEvent<HTMLElement>) => void;
     onCancel?: (event: React.MouseEvent<HTMLElement>) => void;
+    errors?: any;
+    fetchErrors?: () => Promise<any>;
 }
 declare const CustomButton: React.ForwardRefExoticComponent<CustomButtonProps & React.RefAttributes<HTMLButtonElement>>;
 
