@@ -69,7 +69,7 @@ declare const CustomInput: React.ForwardRefExoticComponent<Omit<CustomInputProps
 declare const Select: React.FC<SelectPrimitive.SelectProps>;
 
 type LabelPosition = 'top' | 'left' | 'right';
-type Option$1 = {
+type Option = {
     value: string | number;
     label: string;
     disabled?: boolean;
@@ -78,7 +78,7 @@ type CustomSelectBaseProps<TFieldValues extends FieldValues = FieldValues> = {
     name: Path<TFieldValues>;
     label?: string;
     labelPosition?: LabelPosition;
-    options: Option$1[];
+    options: Option[];
     placeholder?: string;
     rules?: RegisterOptions<TFieldValues, Path<TFieldValues>>;
     error?: string | FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
@@ -100,18 +100,32 @@ declare const CustomSelect: {
     displayName: string;
 };
 
-type Option = {
-    value: string;
+type CheckboxOption = {
+    value: string | number;
     label: string;
     disabled?: boolean;
 };
-interface CheckboxGroupProps extends React.HTMLAttributes<HTMLDivElement> {
-    options: Option[];
-    value?: string[];
-    onValueChange?: (selectedValues: string[]) => void;
+type CustomCheckboxBaseProps<TFieldValues extends FieldValues = FieldValues> = {
+    name: Path<TFieldValues>;
+    label?: string;
+    placeholder?: string;
+    rules?: RegisterOptions<TFieldValues, Path<TFieldValues>>;
+    error?: string | FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
+    wrapperClassName?: string;
+    labelClassName?: string;
+    errorClassName?: string;
+    control?: any;
+    required?: boolean | string;
     disabled?: boolean;
-    orientation?: 'horizontal' | 'vertical';
-}
-declare const CheckboxGroup: React.ForwardRefExoticComponent<CheckboxGroupProps & React.RefAttributes<HTMLDivElement>>;
+    className?: string;
+    onCheckedChange?: (checked: boolean | (string | number)[]) => void;
+    options?: CheckboxOption[];
+    direction?: "horizontal" | "vertical";
+    checked?: boolean;
+};
+declare const CustomCheckbox: {
+    <TFieldValues extends FieldValues = FieldValues>({ name, label, placeholder, rules, error: externalError, wrapperClassName, labelClassName, errorClassName, control: externalControl, required, disabled, className, onCheckedChange, options, direction, checked: externalChecked, ...props }: CustomCheckboxBaseProps<TFieldValues>): react_jsx_runtime.JSX.Element;
+    displayName: string;
+};
 
-export { CheckboxGroup, type CheckboxGroupProps, CustomButton, type CustomButtonProps, CustomInput, CustomSelect, type Option$1 as SelectOption, customButtonVariants };
+export { type CheckboxOption, CustomButton, type CustomButtonProps, CustomCheckbox, CustomInput, CustomSelect, type Option as SelectOption, customButtonVariants };

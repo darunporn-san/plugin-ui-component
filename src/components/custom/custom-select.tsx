@@ -21,7 +21,7 @@ import {
   SelectGroup,
   SelectLabel,
 } from "../ui/select";
-import { cn } from "src/lib/utils";
+import { cn } from "@/lib/utils";
 import { buildValidationRules, LengthRule } from "@/utils/validation-rules";
 
 type LabelPosition = 'top' | 'left' | 'right';
@@ -180,18 +180,18 @@ const CustomSelect = <TFieldValues extends FieldValues = FieldValues>({
   };
 
   const renderError = () => {
-    if (!errorMessage) return null;
-    
     return (
-      <div className="relative min-h-[20px] mt-1">
-        <p
-          className={cn(
-            "text-xs font-medium text-destructive absolute top-0 left-0 w-full",
-            errorClassName
-          )}
-        >
-          {errorMessage}
-        </p>
+      <div className="relative h-5 mt-1">
+        {errorMessage && (
+          <p
+            className={cn(
+              "text-xs font-medium text-destructive absolute top-0 left-0 w-full",
+              errorClassName
+            )}
+          >
+            {errorMessage}
+          </p>
+        )}
       </div>
     );
   };

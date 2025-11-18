@@ -15,7 +15,7 @@ import {
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import type { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
-import { cn } from "src/lib/utils";
+import { cn } from "@/lib/utils";
 import { buildValidationRules, LengthRule } from "@/utils/validation-rules";
 
 // Omit the conflicting props from InputHTMLAttributes
@@ -208,7 +208,7 @@ const CustomInput = React.forwardRef<
         {label && labelPosition !== 'right' && renderLabel()}
         <div className={labelPosition !== 'top' ? 'flex-1' : 'w-full'}>
           {renderInput()}
-          <div className="relative min-h-[20px] mt-1">
+          <div className="relative h-5 mt-1">
             {fieldError && (
               <p
                 className={cn(
