@@ -1,6 +1,6 @@
 import * as class_variance_authority_dist_types from 'class-variance-authority/dist/types';
 import * as React from 'react';
-import { InputHTMLAttributes } from 'react';
+import React__default, { InputHTMLAttributes } from 'react';
 import { VariantProps } from 'class-variance-authority';
 import { FieldValues, Path, RegisterOptions, FieldError, Merge, FieldErrorsImpl } from 'react-hook-form';
 import * as react_jsx_runtime from 'react/jsx-runtime';
@@ -130,4 +130,11 @@ declare const CustomCheckbox: {
     displayName: string;
 };
 
-export { type CheckboxOption, CustomButton, type CustomButtonProps, CustomCheckbox, CustomInput, CustomSelect, type Option as SelectOption, customButtonVariants };
+interface CustomCalendarProps {
+    value?: Date;
+    onChange?: (date: Date) => void;
+}
+declare const customCalendarVariants: () => string;
+declare const CustomCalendar: React__default.ForwardRefExoticComponent<CustomCalendarProps & React__default.RefAttributes<HTMLDivElement>>;
+
+export { type CheckboxOption, CustomButton, type CustomButtonProps, CustomCalendar, CustomCheckbox, CustomInput, CustomSelect, type Option as SelectOption, customButtonVariants, customCalendarVariants };

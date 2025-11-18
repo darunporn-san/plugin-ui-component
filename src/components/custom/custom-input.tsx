@@ -17,6 +17,8 @@ import { Textarea } from "../ui/textarea";
 import type { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 import { buildValidationRules, LengthRule } from "@/utils/validation-rules";
+import { CustomCalendar } from "./custom-calendar";
+import { useEffect, useRef, useState } from "react";
 
 // Omit the conflicting props from InputHTMLAttributes
 // Separate our custom props from native input props
@@ -118,6 +120,20 @@ const CustomInput = React.forwardRef<
     const errors = context?.formState?.errors || {};
     const fieldError = errors[name] || props.error;
 
+    const [calendarOpen, setCalendarOpen] = useState(false);
+    const [selectedDateLocal, setSelectedDateLocal] = useState<Date | undefined>(undefined);
+    const wrapperRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+      function handleClickOutside(e: MouseEvent) {
+        if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+          setCalendarOpen(false);
+        }
+      }
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
     const renderLabel = () => (
       <label
         htmlFor={name}
@@ -176,6 +192,56 @@ const CustomInput = React.forwardRef<
                 )}
                 ref={ref as React.Ref<HTMLTextAreaElement>}
               />
+            );
+          }
+          // If this input is a date input, show calendar popover when focused/clicked
+          if (type === "date" || props.showCalendar) {
+            // Parse field value into Date if possible
+            const parsed = value ? new Date(value as any) : undefined;
+            const validParsed = parsed && !isNaN(parsed.getTime()) ? parsed : undefined;
+
+            // keep local selected date in sync when value changes externally
+            useEffect(() => {
+              setSelectedDateLocal(validParsed);
+            }, [value]);
+
+            const displayValue = selectedDateLocal
+              ? selectedDateLocal.toLocaleDateString()
+              : typeof value === 'string' && value
+              ? value
+              : '';
+
+            return (
+              <div className="relative" ref={wrapperRef}>
+                <Input
+                  {...fieldProps}
+                  {...cleanProps}
+                  readOnly
+                  type="text"
+                  id={name}
+                  value={displayValue}
+                  onClick={() => setCalendarOpen(true)}
+                  onFocus={() => setCalendarOpen(true)}
+                  className={cn(
+                    fieldError &&
+                      "border-destructive focus-visible:ring-destructive",
+                    className
+                  )}
+                  ref={ref as React.Ref<HTMLInputElement>}
+                />
+                {calendarOpen && (
+                  <div className="absolute z-50 mt-1">
+                    <CustomCalendar
+                      value={selectedDateLocal}
+                      onChange={(d: Date) => {
+                        setSelectedDateLocal(d);
+                        field.onChange(d);
+                        setCalendarOpen(false);
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
             );
           }
 
