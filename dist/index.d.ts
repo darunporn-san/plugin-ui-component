@@ -1,6 +1,6 @@
 import * as class_variance_authority_dist_types from 'class-variance-authority/dist/types';
 import * as React from 'react';
-import React__default, { InputHTMLAttributes } from 'react';
+import { InputHTMLAttributes } from 'react';
 import { VariantProps } from 'class-variance-authority';
 import { FieldValues, Path, RegisterOptions, FieldError, Merge, FieldErrorsImpl } from 'react-hook-form';
 import * as react_jsx_runtime from 'react/jsx-runtime';
@@ -131,11 +131,21 @@ declare const CustomCheckbox: {
 };
 
 interface CustomCalendarProps {
-    value?: Date;
-    onChange?: (date?: Date) => void;
+    /** Additional class name */
+    className?: string;
+    /** The selected date */
+    selected?: Date | null;
+    /** Callback when date is selected */
+    onSelect?: (date: Date | undefined) => void;
+    /** Label for the date picker */
+    label?: string;
+    /** Description text */
+    description?: string;
 }
-declare const customCalendarVariants: () => string;
-declare const CustomCalendar: React__default.ForwardRefExoticComponent<CustomCalendarProps & React__default.RefAttributes<HTMLDivElement>>;
+/**
+ * A simple and customizable calendar component
+ */
+declare const CustomCalendar: React.ForwardRefExoticComponent<CustomCalendarProps & React.RefAttributes<HTMLDivElement>>;
 
 type MenuItem = {
     /** Text to display for the menu item */
@@ -174,4 +184,4 @@ type DropdownMenuProps = {
  */
 declare const CustomDropdownMenu: React.ForwardRefExoticComponent<DropdownMenuProps & React.RefAttributes<HTMLButtonElement>>;
 
-export { type CheckboxOption, CustomButton, type CustomButtonProps, CustomCalendar, CustomCheckbox, CustomDropdownMenu, CustomInput, CustomSelect, type Option as SelectOption, customButtonVariants, customCalendarVariants };
+export { type CheckboxOption, CustomButton, type CustomButtonProps, CustomCalendar, CustomCheckbox, CustomDropdownMenu, CustomInput, CustomSelect, type Option as SelectOption, customButtonVariants };

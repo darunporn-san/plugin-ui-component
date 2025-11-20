@@ -1,194 +1,87 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Input } from "../ui/input";
-import { Calendar, X } from "lucide-react";
+"use client"
+
+import * as React from "react"
+import { format } from "date-fns"
+import { Calendar as CalendarIcon } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Calendar as BaseCalendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 interface CustomCalendarProps {
-  value?: Date;
-  onChange?: (date?: Date) => void;
+  /** Additional class name */
+  className?: string
+  /** The selected date */
+  selected?: Date | null
+  /** Callback when date is selected */
+  onSelect?: (date: Date | undefined) => void
+  /** Label for the date picker */
+  label?: string
+  /** Description text */
+  description?: string
 }
 
+/**
+ * A simple and customizable calendar component
+ */
+const CustomCalendar = React.forwardRef<HTMLDivElement, CustomCalendarProps>(({
+  className,
+  selected,
+  onSelect,
+  label = "Date",
+  description = "Select a date",
+  ...rest
+}, ref) => {
+  const [date, setDate] = React.useState<Date | undefined>(selected || undefined)
 
-const daysOfWeek = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+  React.useEffect(() => {
+    setDate(selected || undefined)
+  }, [selected])
 
-// Calendar variants (for future extension, e.g. color, size)
-// Example: const customCalendarVariants = cva(...)
-// For now, just a placeholder for API consistency
-export const customCalendarVariants = () => "";
-
-function getDaysInMonth(year: number, month: number) {
-  return new Date(year, month + 1, 0).getDate();
-}
-
-function getFirstDayOfMonth(year: number, month: number) {
-  return new Date(year, month, 1).getDay();
-}
-
-
-const CustomCalendar = React.forwardRef<HTMLDivElement, CustomCalendarProps>(
-  ({ value, onChange }, ref) => {
-    const today = new Date();
-    const [calendarOpen, setCalendarOpen] = useState(false);
-    const [currentMonth, setCurrentMonth] = useState<number>(value?.getMonth() ?? today.getMonth());
-    const [currentYear, setCurrentYear] = useState<number>(value?.getFullYear() ?? today.getFullYear());
-    const [selectedDate, setSelectedDate] = useState<Date | undefined>(value);
-    const [inputValue, setInputValue] = useState<string>(value ? value.toLocaleDateString() : "");
-    const wrapperRef = useRef<HTMLDivElement | null>(null);
-    const inputRef = useRef<HTMLInputElement | null>(null);
-
-    useEffect(() => {
-      // sync when value prop changes
-      setSelectedDate(value);
-      setInputValue(value ? value.toLocaleDateString() : "");
-      setCurrentMonth(value?.getMonth() ?? today.getMonth());
-      setCurrentYear(value?.getFullYear() ?? today.getFullYear());
-    }, [value]);
-
-    useEffect(() => {
-      function handleClickOutside(e: MouseEvent) {
-        if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
-          setCalendarOpen(false);
-        }
-      }
-      function handleKey(e: KeyboardEvent) {
-        if (e.key === "Escape") setCalendarOpen(false);
-      }
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("keydown", handleKey);
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-        document.removeEventListener("keydown", handleKey);
-      };
-    }, []);
-
-    const daysInMonth = getDaysInMonth(currentYear, currentMonth);
-    const firstDay = getFirstDayOfMonth(currentYear, currentMonth);
-
-    const handlePrevMonth = () => {
-      if (currentMonth === 0) {
-        setCurrentMonth(11);
-        setCurrentYear(currentYear - 1);
-      } else {
-        setCurrentMonth(currentMonth - 1);
-      }
-    };
-
-    const handleNextMonth = () => {
-      if (currentMonth === 11) {
-        setCurrentMonth(0);
-        setCurrentYear(currentYear + 1);
-      } else {
-        setCurrentMonth(currentMonth + 1);
-      }
-    };
-
-    const handleDateClick = (day: number) => {
-      const date = new Date(currentYear, currentMonth, day);
-      setSelectedDate(date);
-      setInputValue(date.toLocaleDateString());
-      onChange?.(date);
-      setCalendarOpen(false);
-    };
-
-    const toggleCalendar = () => setCalendarOpen((v) => !v);
-
-    return (
-      <div ref={ref} className="relative inline-block" aria-expanded={calendarOpen}>
-        <div ref={wrapperRef} className="w-80">
-          <div className="relative">
-            <Input
-              ref={inputRef}
-              readOnly
-              value={inputValue}
-              onClick={() => setCalendarOpen(true)}
-              onFocus={() => setCalendarOpen(true)}
-              placeholder="DD/MM/YYYY"
-              className="w-full pr-10"
-            />
-
-            {inputValue ? (
-              <button
-                type="button"
-                aria-label="Clear date"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedDate(undefined);
-                  setInputValue("");
-                  onChange?.();
-                  setCalendarOpen(false);
-                  // don't focus the input here — focusing would trigger onFocus and reopen the calendar
-                }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            ) : (
-              <button
-                type="button"
-                aria-label="Toggle calendar"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  // toggle, but only focus the input when opening to avoid immediate reopen
-                  setCalendarOpen((prev) => {
-                    const next = !prev;
-                    if (next) inputRef.current?.focus();
-                    return next;
-                  });
-                }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-              >
-                <Calendar className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-
-          {calendarOpen && (
-            <div className="absolute z-50 mt-2">
-              <div className="w-80 p-4 bg-white rounded-lg shadow">
-                <div className="flex justify-between items-center mb-2">
-                  <button onClick={handlePrevMonth} className="px-2 py-1 rounded hover:bg-gray-100">&lt;</button>
-                  <span className="font-semibold">
-                    {new Date(currentYear, currentMonth).toLocaleString("default", { month: "long" })} {currentYear}
-                  </span>
-                  <button onClick={handleNextMonth} className="px-2 py-1 rounded hover:bg-gray-100">&gt;</button>
-                </div>
-                <div className="grid grid-cols-7 gap-1 mb-1">
-                  {daysOfWeek.map((day) => (
-                    <div key={day} className="text-center font-medium text-gray-500">{day}</div>
-                  ))}
-                </div>
-                <div className="grid grid-cols-7 gap-1">
-                  {Array.from({ length: firstDay }).map((_, i) => (
-                    <div key={"empty-" + i} />
-                  ))}
-                  {Array.from({ length: daysInMonth }).map((_, i) => {
-                    const day = i + 1;
-                    const isSelected =
-                      selectedDate &&
-                      selectedDate.getDate() === day &&
-                      selectedDate.getMonth() === currentMonth &&
-                      selectedDate.getFullYear() === currentYear;
-                    return (
-                      <button
-                        key={day}
-                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm hover:bg-blue-100 ${
-                          isSelected ? "bg-blue-500 text-white" : ""
-                        }`}
-                        onClick={() => handleDateClick(day)}
-                      >
-                        {day}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    );
+  const handleSelect = (newDate: Date | undefined) => {
+    setDate(newDate)
+    onSelect?.(newDate)
   }
-);
 
-CustomCalendar.displayName = "CustomCalendar";
+  return (
+    <div ref={ref} className={cn("w-full space-y-2", className)}>
+      {label && <label className="text-sm font-medium">{label}</label>}
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className={cn(
+              "w-full justify-between text-left font-normal",
+              !date && "text-muted-foreground"
+            )}
+          >
+            {date ? format(date, "PPP") : <span>Pick a date</span>}
+            <CalendarIcon className="mr-2 h-4 w-4" />
 
-export { CustomCalendar };
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="center">
+          <BaseCalendar
+            mode="single"
+            selected={date}
+            onSelect={setDate}
+            className="rounded-md border shadow-sm"
+            captionLayout="dropdown"
+            {...rest}
+          />
+        </PopoverContent>
+      </Popover>
+      {description && (
+        <p className="text-sm text-muted-foreground">{description}</p>
+      )}
+    </div>
+  )
+})
+
+CustomCalendar.displayName = "CustomCalendar"
+
+export { CustomCalendar }
