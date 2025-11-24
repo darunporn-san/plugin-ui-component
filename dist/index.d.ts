@@ -135,12 +135,18 @@ interface CustomCalendarProps {
     className?: string;
     /** The selected date */
     selected?: Date | null;
+    /** The selected date (alternative to 'selected') */
+    value?: Date | null;
     /** Callback when date is selected */
     onSelect?: (date: Date | undefined) => void;
+    /** Callback when date is selected (alternative to 'onSelect') */
+    onChange?: (date: Date | undefined) => void;
     /** Label for the date picker */
     label?: string;
     /** Description text */
     description?: string;
+    /** Placeholder text for the input */
+    placeholder?: string;
 }
 /**
  * A simple and customizable calendar component
