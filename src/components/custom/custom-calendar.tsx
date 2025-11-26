@@ -30,6 +30,7 @@ interface CustomCalendarProps<T extends FieldValues> {
   name?: Path<T>;
   error?: FieldError;
   required?: boolean;
+  disabled?: boolean;
 }
 
 // 💡 Combined Wrapper + Popover Component
@@ -43,11 +44,22 @@ interface CalendarBoxProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   children: React.ReactNode;
+  disabled?: boolean;
 }
 
 const CalendarBox = React.forwardRef<HTMLDivElement, CalendarBoxProps>(
   (
-    { className, label, required, error, displayText, open, setOpen, children },
+    {
+      className,
+      label,
+      required,
+      error,
+      displayText,
+      open,
+      setOpen,
+      children,
+      disabled,
+    },
     ref
   ) => (
     <div ref={ref} className={cn("w-full space-y-2", className)}>
@@ -62,6 +74,7 @@ const CalendarBox = React.forwardRef<HTMLDivElement, CalendarBoxProps>(
         <PopoverTrigger asChild>
           <Button
             variant="outline"
+            disabled={disabled}
             className={cn(
               "w-full justify-between text-left font-normal",
               !displayText && "text-muted-foreground"
@@ -102,6 +115,7 @@ const CustomCalendar = React.forwardRef<
       name,
       error,
       required = false,
+      disabled = false,
       ...rest
     },
     ref
@@ -116,7 +130,6 @@ const CustomCalendar = React.forwardRef<
         : undefined
     );
 
-
     React.useEffect(() => {
       if (open) {
         console.log("open", tempDate, date);
@@ -126,7 +139,8 @@ const CustomCalendar = React.forwardRef<
         if ("from" in date && "to" in date) {
           if (
             !tempDate ||
-            (("from" in tempDate && "to" in tempDate) &&
+            ("from" in tempDate &&
+              "to" in tempDate &&
               (tempDate.from !== date.from || tempDate.to !== date.to))
           ) {
             setTempDate(date as DateRange);
@@ -204,7 +218,21 @@ const CustomCalendar = React.forwardRef<
             <BaseCalendar
               mode="range"
               selected={tempDate as DateRange | undefined}
-              onSelect={(v: DateRange | undefined) => setTempDate(v)}
+              // onSelect={(v: DateRange | undefined) => setTempDate(v)}
+              onSelect={(range: DateRange | undefined, index: any) => {
+                if (!range) return;
+                if (!tempDate?.from || (tempDate?.from && tempDate?.to)) {
+                  // No start date yet or both dates are set → start a new range
+                  setTempDate({ from: index, to: undefined });
+                } else if (!tempDate.to) {
+                  // Only start date is set
+                  setTempDate(
+                    index < tempDate.from
+                      ? { from: index, to: undefined }
+                      : { ...tempDate, to: index }
+                  );
+                }
+              }}
               numberOfMonths={2}
               captionLayout="dropdown"
               required={required}
@@ -267,6 +295,7 @@ const CustomCalendar = React.forwardRef<
               displayText={displayText}
               open={open}
               setOpen={setOpen}
+              disabled={disabled}
             >
               {renderCalendar(value, onChange)}
             </CalendarBox>
@@ -300,6 +329,7 @@ const CustomCalendar = React.forwardRef<
         error={error}
         displayText={getDisplayText(date)}
         open={open}
+        disabled={disabled}
         setOpen={setOpen}
       >
         {open && renderCalendar(date)}

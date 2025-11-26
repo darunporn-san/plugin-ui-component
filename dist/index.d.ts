@@ -139,6 +139,7 @@ interface CustomCalendarProps<T extends FieldValues> {
     name?: Path<T>;
     error?: FieldError;
     required?: boolean;
+    disabled?: boolean;
 }
 declare const CustomCalendar: React.ForwardRefExoticComponent<CustomCalendarProps<any> & React.RefAttributes<HTMLDivElement>>;
 
