@@ -1,162 +1,223 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { format, parse } from "date-fns"
-import { Calendar as CalendarIcon, X } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Calendar as BaseCalendar } from "@/components/ui/calendar"
-import { Input } from "@/components/ui/input"
+import * as React from "react";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar as BaseCalendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
+import { DateRange } from "react-day-picker";
+import {
+  Control,
+  Controller,
+  FieldValues,
+  Path,
+  FieldError,
+} from "react-hook-form";
 
-interface CustomCalendarProps {
-  /** Additional class name */
-  className?: string
-  /** The selected date */
-  selected?: Date | null
-  /** The selected date (alternative to 'selected') */
-  value?: Date | null
-  /** Callback when date is selected */
-  onSelect?: (date: Date | undefined) => void
-  /** Callback when date is selected (alternative to 'onSelect') */
-  onChange?: (date: Date | undefined) => void
-  /** Label for the date picker */
-  label?: string
-  /** Description text */
-  description?: string
-  /** Placeholder text for the input */
-  placeholder?: string
+interface CustomCalendarProps<T extends FieldValues> {
+  className?: string;
+  selected?: Date | DateRange;
+  onSelect?: (value: Date | DateRange | undefined) => void;
+  label?: string;
+  mode?: "single" | "range";
+  control?:any;
+  name?: Path<T>;
+  error?: FieldError;
+  required?: boolean;
 }
 
-const formatDate = (date: Date | null | undefined) => {
-  return date ? format(date, "PPP") : ""
-}
+const CustomCalendar = React.forwardRef<HTMLDivElement, CustomCalendarProps<any>>(
+  (
+    {
+      mode = "single",
+      className,
+      selected: externalSelected,
+      onSelect: externalOnSelect,
+      label = "Date",
+      control,
+      name,
+      error,
+      required = false,
+      ...rest
+    },
+    ref
+  ) => {
+    // 📌 Local States
+    const [open, setOpen] = React.useState(false);
+    const [date, setDate] = React.useState<Date | DateRange | undefined>(externalSelected);
+    const [tempDate, setTempDate] = React.useState<DateRange | undefined>(
+      (externalSelected as DateRange) || undefined
+    );
 
-const parseInputDate = (value: string): Date | undefined => {
-  if (!value) return undefined
-  try {
-    return parse(value, "yyyy-MM-dd", new Date())
-  } catch {
-    return undefined
-  }
-}
+    // 🔄 Update from outside
+    React.useEffect(() => {
+      setDate(externalSelected);
+      if (mode === "range") setTempDate(externalSelected as DateRange);
+    }, [externalSelected, mode]);
 
-/**
- * A simple and customizable calendar component
- */
-const CustomCalendar = React.forwardRef<HTMLDivElement, CustomCalendarProps>(({
-  className,
-  selected,
-  value,
-  onSelect,
-  onChange,
-  label,
-  description,
-  placeholder = "Select a date from the calendar",
-  ...rest
-}, ref) => {
-  const [open, setOpen] = React.useState(false)
-  const [inputValue, setInputValue] = React.useState("")
-  const [date, setDate] = React.useState<Date | undefined>(value ?? selected ?? undefined)
-  const [month, setMonth] = React.useState<Date | undefined>(date)
-  
-  // Use onChange if provided, otherwise fall back to onSelect
-  const handleChange = onChange ?? onSelect
+    // 🔹 Unified handler (for both modes + RHF)
+    const handleChange = React.useCallback(
+      (value: Date | DateRange | undefined) => {
+        setDate(value);
+        externalOnSelect?.(value);
+      },
+      [externalOnSelect]
+    );
 
-  React.useEffect(() => {
-    setDate(value ?? selected ?? undefined)
-    setMonth(value ?? selected ?? undefined)
-    const dateToFormat = value ?? selected;
-    setInputValue(dateToFormat ? formatDate(dateToFormat) : "")
-  }, [value, selected])
+    // 🧠 Display Text
+    const getDisplayText = (value?: Date | DateRange) => {
+      if (!value) return mode === "range" ? "Pick a date range" : "Pick a date";
 
-  const handleSelect = (newDate: Date | undefined) => {
-    setDate(newDate)
-    setInputValue(newDate ? formatDate(newDate) : "")
-    handleChange?.(newDate)
-  }
+      if (mode === "range") {
+        const range = value as DateRange;
+        if (range.from && range.to) return `${format(range.from, "PPP")} - ${format(range.to, "PPP")}`;
+        if (range.from) return `${format(range.from, "PPP")} - ...`;
+        return "Pick a date range";
+      }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setInputValue(value)
-    
-    const parsedDate = parseInputDate(value)
-    if (parsedDate) {
-      setDate(parsedDate)
-      setMonth(parsedDate)
-      handleChange?.(parsedDate)
-    } else if (!value) {
-      setDate(undefined)
-      handleChange?.(undefined)
-    }
-  }
+      return format(value as Date, "PPP");
+    };
 
-  return (
-    <div ref={ref} className={cn("w-full space-y-2", className)}>
-      <div className="relative flex gap-2">
-        <Input
-          id="date-picker"
-          value={inputValue}
-          onChange={handleInputChange}
-          placeholder="Select a date from the calendar"
-          readOnly
-          className="bg-background pr-10"
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault()
-              setOpen(false)
-            }
+    // 🧩 Render Calendar UI (both modes)
+    const renderCalendar = (
+      value?: Date | DateRange,
+      onChange?: (v: any) => void
+    ) => {
+      if (mode === "range") {
+        return (
+          <>
+            <BaseCalendar
+              mode="range"
+              selected={tempDate as DateRange | undefined}
+              onSelect={(v: DateRange | undefined) => {
+                setTempDate(v);
+              }}
+              numberOfMonths={2}
+              captionLayout="dropdown"
+              required={required}
+              {...rest}
+            />
+            <div className="border-t flex p-1 space-x-2 justify-end">
+              <Button variant="outline" onClick={() => setTempDate(undefined)}>
+                Reset
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  onChange?.(tempDate);
+                  handleChange(tempDate);
+                  setOpen(false);
+                }}
+              >
+                Apply
+              </Button>
+            </div>
+          </>
+        );
+      }
+
+      // 🧠 Single mode
+      return (
+        <BaseCalendar
+          mode="single"
+          selected={value as Date | undefined}
+          onSelect={(v: Date | undefined) => {
+            onChange?.(v);
+            handleChange(v);
+            setOpen(false);
           }}
+          captionLayout="dropdown"
+          required={required}
+          {...rest}
         />
+      );
+    };
+
+
+    // 🔐 RHF Controlled mode
+    if (control && name) {
+      return (
+        <Controller
+          control={control}
+          name={name}
+          rules={{ required }}
+          render={({ field: { value, onChange } }) => (
+            <div ref={ref} className={cn("w-full space-y-2", className)}>
+              {label && (
+                <label className="text-sm font-medium">
+                  {label}
+                  {required && <span className="text-destructive">*</span>}
+                </label>
+              )}
+
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-between text-left font-normal",
+                      !value && "text-muted-foreground"
+                    )}
+                  >
+                    {getDisplayText(value)}
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+
+                <PopoverContent className="w-auto p-0" align="center">
+                  {renderCalendar(value, onChange)}
+                </PopoverContent>
+              </Popover>
+
+              {error && (
+                <p className="text-sm font-medium text-destructive">
+                  {error.message || "This field is required"}
+                </p>
+              )}
+            </div>
+          )}
+        />
+      );
+    }
+
+    // 🔓 Non-controlled mode
+    return (
+      <div ref={ref} className={cn("w-full space-y-2", className)}>
+        {label && (
+          <label className="text-sm font-medium">
+            {label}
+            {required && <span className="text-destructive">*</span>}
+          </label>
+        )}
+
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
-              variant="ghost"
-              className="absolute right-0 top-0 h-full px-3"
-              onClick={() => {
-                if (date) {
-                  handleSelect(undefined);
-                  setInputValue("");
-                } else {
-                  setOpen(!open);
-                }
-              }}
-            >
-              {date ? (
-                <X className="h-4 w-4" />
-              ) : (
-                <CalendarIcon className="h-4 w-4" />
+              variant="outline"
+              className={cn(
+                "w-full justify-between text-left font-normal",
+                !date && "text-muted-foreground"
               )}
-              <span className="sr-only">{date ? 'Clear date' : 'Select date'}</span>
+            >
+              {getDisplayText(date)}
+              <CalendarIcon className="mr-2 h-4 w-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="end">
-            <BaseCalendar
-              mode="single"
-              selected={date}
-              onSelect={handleSelect}
-              month={month}
-              onMonthChange={setMonth}
-              className="rounded-md border shadow-sm"
-              captionLayout="dropdown"
-              {...rest}
-            />
+
+          <PopoverContent className="w-auto p-0" align="center">
+            {renderCalendar(date)}
           </PopoverContent>
         </Popover>
       </div>
-      {description && (
-        <p className="text-sm text-muted-foreground">
-          {date ? `Selected: ${format(date, "PPP")}` : description}
-        </p>
-      )}
-    </div>
-  )
-})
+    );
+  }
+);
 
-CustomCalendar.displayName = "CustomCalendar"
-
-export { CustomCalendar }
+CustomCalendar.displayName = "CustomCalendar";
+export { CustomCalendar };

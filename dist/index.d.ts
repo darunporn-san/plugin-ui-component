@@ -4,7 +4,7 @@ import { InputHTMLAttributes } from 'react';
 import { VariantProps } from 'class-variance-authority';
 import { FieldValues, Path, RegisterOptions, FieldError, Merge, FieldErrorsImpl } from 'react-hook-form';
 import * as react_jsx_runtime from 'react/jsx-runtime';
-import * as SelectPrimitive from '@radix-ui/react-select';
+import { DateRange } from 'react-day-picker';
 
 declare const buttonVariants: (props?: ({
     variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | null | undefined;
@@ -68,9 +68,7 @@ type CustomInputProps<TFieldValues extends FieldValues = FieldValues> = CustomIn
 };
 declare const CustomInput: React.ForwardRefExoticComponent<Omit<CustomInputProps<FieldValues>, "ref"> & React.RefAttributes<HTMLInputElement | HTMLTextAreaElement>>;
 
-declare const Select: React.FC<SelectPrimitive.SelectProps>;
-
-type LabelPosition = 'top' | 'left' | 'right';
+type LabelPosition = "top" | "left" | "right";
 type Option = {
     value: string | number;
     label: string;
@@ -93,12 +91,13 @@ type CustomSelectBaseProps<TFieldValues extends FieldValues = FieldValues> = {
     className?: string;
     onValueChange?: (value: string) => void;
 };
-type CustomSelectProps<TFieldValues extends FieldValues> = Omit<React.ComponentProps<typeof Select>, 'onValueChange' | 'defaultValue' | 'value' | 'name' | 'disabled'> & CustomSelectBaseProps<TFieldValues> & {
+type CustomSelectProps<TFieldValues extends FieldValues = FieldValues> = CustomSelectBaseProps<TFieldValues> & {
     value?: string | number;
     onChange?: (value: string) => void;
+    defaultValue?: string | number;
 };
 declare const CustomSelect: {
-    <TFieldValues extends FieldValues = FieldValues>({ name, label, labelPosition, options, placeholder, rules, error: externalError, wrapperClassName, labelClassName, errorClassName, control: externalControl, required, disabled, className, onValueChange, ...props }: CustomSelectProps<TFieldValues>): react_jsx_runtime.JSX.Element;
+    <TFieldValues extends FieldValues = FieldValues>({ name, label, labelPosition, options, placeholder, rules, error: externalError, wrapperClassName, labelClassName, errorClassName, control: externalControl, required, disabled, className, onValueChange, value: externalValue, onChange: externalOnChange, }: CustomSelectProps<TFieldValues>): react_jsx_runtime.JSX.Element;
     displayName: string;
 };
 
@@ -130,28 +129,18 @@ declare const CustomCheckbox: {
     displayName: string;
 };
 
-interface CustomCalendarProps {
-    /** Additional class name */
+interface CustomCalendarProps<T extends FieldValues> {
     className?: string;
-    /** The selected date */
-    selected?: Date | null;
-    /** The selected date (alternative to 'selected') */
-    value?: Date | null;
-    /** Callback when date is selected */
-    onSelect?: (date: Date | undefined) => void;
-    /** Callback when date is selected (alternative to 'onSelect') */
-    onChange?: (date: Date | undefined) => void;
-    /** Label for the date picker */
+    selected?: Date | DateRange;
+    onSelect?: (value: Date | DateRange | undefined) => void;
     label?: string;
-    /** Description text */
-    description?: string;
-    /** Placeholder text for the input */
-    placeholder?: string;
+    mode?: "single" | "range";
+    control?: any;
+    name?: Path<T>;
+    error?: FieldError;
+    required?: boolean;
 }
-/**
- * A simple and customizable calendar component
- */
-declare const CustomCalendar: React.ForwardRefExoticComponent<CustomCalendarProps & React.RefAttributes<HTMLDivElement>>;
+declare const CustomCalendar: React.ForwardRefExoticComponent<CustomCalendarProps<any> & React.RefAttributes<HTMLDivElement>>;
 
 type MenuItem = {
     /** Text to display for the menu item */
@@ -190,4 +179,4 @@ type DropdownMenuProps = {
  */
 declare const CustomDropdownMenu: React.ForwardRefExoticComponent<DropdownMenuProps & React.RefAttributes<HTMLButtonElement>>;
 
-export { type CheckboxOption, CustomButton, type CustomButtonProps, CustomCalendar, CustomCheckbox, CustomDropdownMenu, CustomInput, CustomSelect, type Option as SelectOption, customButtonVariants };
+export { type CheckboxOption, CustomButton, type CustomButtonProps, CustomCalendar, CustomCheckbox, CustomDropdownMenu, CustomInput, CustomSelect, type CustomSelectBaseProps, type CustomSelectProps, type Option, type Option as SelectOption, customButtonVariants };

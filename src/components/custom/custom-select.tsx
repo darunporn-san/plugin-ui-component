@@ -6,10 +6,8 @@ import {
   FieldErrorsImpl,
   Merge,
   RegisterOptions,
-  ControllerRenderProps,
   FieldValues,
   Path,
-  FieldPath,
 } from "react-hook-form";
 import { ChevronDown, X } from "lucide-react";
 import {
@@ -19,20 +17,20 @@ import {
   SelectContent,
   SelectItem,
   SelectGroup,
-  SelectLabel,
 } from "../ui/select";
 import { cn } from "@/lib/utils";
-import { buildValidationRules, LengthRule } from "@/utils/validation-rules";
 
-type LabelPosition = 'top' | 'left' | 'right';
+type LabelPosition = "top" | "left" | "right";
 
-type Option = {
+export type Option = {
   value: string | number;
   label: string;
   disabled?: boolean;
 };
 
-type CustomSelectBaseProps<TFieldValues extends FieldValues = FieldValues> = {
+export type CustomSelectBaseProps<
+  TFieldValues extends FieldValues = FieldValues
+> = {
   name: Path<TFieldValues>;
   label?: string;
   labelPosition?: LabelPosition;
@@ -50,21 +48,26 @@ type CustomSelectBaseProps<TFieldValues extends FieldValues = FieldValues> = {
   onValueChange?: (value: string) => void;
 };
 
-type CustomSelectProps<TFieldValues extends FieldValues> = Omit<
-  React.ComponentProps<typeof BaseSelect>,
-  'onValueChange' | 'defaultValue' | 'value' | 'name' | 'disabled'
-> &
-  CustomSelectBaseProps<TFieldValues> & {
-    value?: string | number;
-    onChange?: (value: string) => void;
-  };
+export type CustomSelectProps<
+  TFieldValues extends FieldValues = FieldValues
+> = CustomSelectBaseProps<TFieldValues> & {
+  value?: string | number;
+  onChange?: (value: string) => void;
+  defaultValue?: string | number;
+};
 
-const CustomSelect = <TFieldValues extends FieldValues = FieldValues>({
+/* -------------------------------------------------------
+   COMPONENT
+------------------------------------------------------- */
+
+const CustomSelect = <
+  TFieldValues extends FieldValues = FieldValues
+>({
   name,
   label,
-  labelPosition = 'top',
+  labelPosition = "top",
   options,
-  placeholder = 'Select an option',
+  placeholder = "Select an option",
   rules = {},
   error: externalError,
   wrapperClassName,
@@ -75,47 +78,66 @@ const CustomSelect = <TFieldValues extends FieldValues = FieldValues>({
   disabled = false,
   className,
   onValueChange,
-  ...props
+  value: externalValue,
+  onChange: externalOnChange,
 }: CustomSelectProps<TFieldValues>) => {
   const formContext = useFormContext<TFieldValues>();
-  const control = externalControl || (formContext?.control as any);
-  const error = externalError || (name && formContext?.formState?.errors?.[name]);
-  const errorMessage = typeof error === 'string' 
-    ? error 
-    : error?.message?.toString() || undefined;
+  const control = externalControl || formContext?.control;
 
-  // Build validation rules
+  // error handling
+  const hookError =
+    formContext?.formState?.errors?.[name as keyof TFieldValues];
+
+  const error = externalError || hookError;
+  const errorMessage =
+    typeof error === "string"
+      ? error
+      : error?.message?.toString() || undefined;
+
+  // validation
   const validationRules = React.useMemo(() => {
     return {
-      ...(required && { required: typeof required === 'string' ? required : 'This field is required' }),
+      ...(required && {
+        required:
+          typeof required === "string"
+            ? required
+            : "This field is required",
+      }),
       ...rules,
     };
   }, [required, rules]);
 
+  /* -------------------- RENDER LABEL -------------------- */
+
   const renderLabel = () => {
     if (!label) return null;
-    
+
     return (
       <label
         htmlFor={name}
         className={cn(
-          'text-sm font-medium leading-none',
-          disabled && 'opacity-50',
+          "text-sm font-medium leading-none",
+          disabled && "opacity-50",
           labelClassName
         )}
       >
         {label}
-        {required && <span className="text-destructive ml-1">*</span>}
+        {required && (
+          <span className="text-destructive ml-1">*</span>
+        )}
       </label>
     );
   };
 
+  /* ------------------ MAIN SELECT RENDER ------------------ */
+
   const renderSelect = (field: any) => {
     const rawValue = field?.value;
     const normalizedValue =
-      rawValue === null || rawValue === undefined || rawValue === ""
+      rawValue === undefined || rawValue === null || rawValue === ""
         ? ""
         : String(rawValue);
+
     const hasValue = normalizedValue !== "";
 
     const handleValueChange = (value: string) => {
@@ -123,8 +145,8 @@ const CustomSelect = <TFieldValues extends FieldValues = FieldValues>({
       onValueChange?.(value);
     };
 
-    const handleClear = (e: React.MouseEvent) => {
-      e.stopPropagation(); // Prevent the select from opening
+    const handleClear = (event: React.MouseEvent) => {
+      event.stopPropagation();
       field?.onChange?.("");
       onValueChange?.("");
     };
@@ -132,7 +154,6 @@ const CustomSelect = <TFieldValues extends FieldValues = FieldValues>({
     return (
       <div className="relative">
         <BaseSelect
-          {...field}
           value={normalizedValue}
           onValueChange={handleValueChange}
           disabled={disabled}
@@ -140,32 +161,37 @@ const CustomSelect = <TFieldValues extends FieldValues = FieldValues>({
           <SelectTrigger
             className={cn(
               "w-full pr-9 [&>svg:last-child]:hidden",
-              errorMessage && "border-destructive focus-visible:ring-destructive",
+              errorMessage &&
+                "border-destructive focus-visible:ring-destructive",
               className
             )}
           >
-            <SelectValue placeholder={!hasValue ? placeholder : undefined} />
+            <SelectValue
+              placeholder={!hasValue ? placeholder : undefined}
+            />
           </SelectTrigger>
+
           <SelectContent>
             <SelectGroup>
-              {options.map((option) => (
+              {options.map((o) => (
                 <SelectItem
-                  key={String(option.value)}
-                  value={String(option.value)}
-                  disabled={option.disabled}
+                  key={String(o.value)}
+                  value={String(o.value)}
+                  disabled={o.disabled}
                 >
-                  {option.label}
+                  {o.label}
                 </SelectItem>
               ))}
             </SelectGroup>
           </SelectContent>
         </BaseSelect>
+
         {hasValue && !disabled ? (
           <button
             type="button"
             aria-label="Clear selection"
             className="absolute inset-y-0 right-2 flex items-center text-muted-foreground hover:text-foreground focus:outline-none"
-            onMouseDown={(event) => event.preventDefault()}
+            onMouseDown={(e) => e.preventDefault()}
             onClick={handleClear}
           >
             <X className="h-4 w-4" />
@@ -179,22 +205,24 @@ const CustomSelect = <TFieldValues extends FieldValues = FieldValues>({
     );
   };
 
-  const renderError = () => {
-    return (
-      <div className="relative h-5 mt-1">
-        {errorMessage && (
-          <p
-            className={cn(
-              "text-xs font-medium text-destructive absolute top-0 left-0 w-full",
-              errorClassName
-            )}
-          >
-            {errorMessage}
-          </p>
-        )}
-      </div>
-    );
-  };
+  /* --------------------- RENDER ERROR --------------------- */
+
+  const renderError = () => (
+    <div className="relative h-5 mt-1">
+      {errorMessage && (
+        <p
+          className={cn(
+            "text-xs font-medium text-destructive absolute top-0 left-0 w-full",
+            errorClassName
+          )}
+        >
+          {errorMessage}
+        </p>
+      )}
+    </div>
+  );
+
+  /* --------------------- FORM CONTROL --------------------- */
 
   const content = control ? (
     <Controller
@@ -205,30 +233,34 @@ const CustomSelect = <TFieldValues extends FieldValues = FieldValues>({
     />
   ) : (
     renderSelect({
-      value: props.value,
-      onChange: props.onChange,
+      value: externalValue,
+      onChange: externalOnChange,
     })
   );
 
+  /* --------------------- LAYOUT ---------------------------- */
+
   const containerClasses = cn(
-    'w-full',
-    labelPosition === 'left' ? 'flex items-center space-x-4' : 'space-y-2',
+    "w-full",
+    labelPosition === "left"
+      ? "flex items-center space-x-4"
+      : "space-y-2",
     wrapperClassName
   );
 
   const labelContainerClasses = cn(
-    'block',
-    labelPosition === 'left' ? 'w-1/4' : 'w-full'
+    "block",
+    labelPosition === "left" ? "w-1/4" : "w-full"
   );
 
   const inputContainerClasses = cn(
-    labelPosition === 'left' ? 'w-3/4' : 'w-full',
-    'relative'
+    labelPosition === "left" ? "w-3/4" : "w-full",
+    "relative"
   );
 
   return (
     <div className={containerClasses}>
-      {labelPosition === 'left' ? (
+      {labelPosition === "left" ? (
         <>
           <div className={labelContainerClasses}>
             {renderLabel()}
@@ -254,5 +286,4 @@ const CustomSelect = <TFieldValues extends FieldValues = FieldValues>({
 CustomSelect.displayName = "CustomSelect";
 
 export { CustomSelect };
-
 export type { Option as SelectOption };
