@@ -25,7 +25,7 @@ function Calendar({
 
   return (
     <DayPicker
-      
+
       showOutsideDays={showOutsideDays}
       className={cn(
         "bg-background group/calendar p-3 [--cell-size:2rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
@@ -35,10 +35,11 @@ function Calendar({
       )}
       captionLayout={captionLayout}
       formatters={{
-        formatMonthDropdown: (date) =>
-          date.toLocaleString("default", { month: "short" }),
+        formatMonthDropdown: (date) => date.toLocaleString('default', { month: 'short' }),
         ...formatters,
       }}
+      fromYear={new Date().getFullYear() - 15}
+      toYear={new Date().getFullYear() + 15}
       classNames={{
         root: cn("w-fit", defaultClassNames.root),
         months: cn(
