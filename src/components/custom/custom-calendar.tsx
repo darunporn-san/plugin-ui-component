@@ -116,21 +116,30 @@ const CustomCalendar = React.forwardRef<
         : undefined
     );
 
-    // React.useEffect(()=>{
-    //   if(open){
-    //     console.log('open',tempDate,date);
-    //     if(!date) return;
-    //     if(tempDate?.from !== date?.from || tempDate?.to !== date?.to){
-    //         setTempDate(date as DateRange);
-    //     }
-        
-    //   }
-    // },[open])
+
+    React.useEffect(() => {
+      if (open) {
+        console.log("open", tempDate, date);
+        if (!date) return;
+
+        // Narrow the type to DateRange
+        if ("from" in date && "to" in date) {
+          if (
+            !tempDate ||
+            (("from" in tempDate && "to" in tempDate) &&
+              (tempDate.from !== date.from || tempDate.to !== date.to))
+          ) {
+            setTempDate(date as DateRange);
+          }
+        }
+      }
+    }, [open]);
+
     // Sync states when externalSelected changes
     React.useEffect(() => {
       setDate(externalSelected);
       console.log("externalSelected", externalSelected);
-      
+
       if (mode === "range") {
         setTempDate(
           (externalSelected as DateRange) || { from: undefined, to: undefined }
@@ -164,7 +173,7 @@ const CustomCalendar = React.forwardRef<
       value?: Date | DateRange,
       onChange?: (v: any) => void
     ) => {
-      console.log("renderCalendar", value, tempDate);
+      // console.log("renderCalendar", value, tempDate);
       const handleApply = () => {
         if (mode === "range" && tempDate?.from && tempDate?.to) {
           const newValue = { from: tempDate.from, to: tempDate.to };
