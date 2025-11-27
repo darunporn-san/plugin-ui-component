@@ -66,7 +66,6 @@ type Option = {
     disabled?: boolean;
 };
 type CustomSelectBaseProps<TFieldValues extends FieldValues = FieldValues> = {
-    name: Path<TFieldValues>;
     label?: string;
     labelPosition?: LabelPosition;
     options: Option[];
@@ -236,7 +235,7 @@ interface Column<T> {
     accessor: keyof T | ((row: T) => React$1.ReactNode);
     className?: string;
 }
-type Position = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
+type Position = "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
 interface DataTableProps<T> {
     columns: Column<T>[];
     data: T[];
@@ -249,9 +248,10 @@ interface DataTableProps<T> {
     isPagination?: boolean;
     countPosition?: Position;
     paginationPosition?: Position;
+    pageSizePosition?: Position;
     rowKey?: keyof T | ((row: T) => React$1.Key);
 }
-declare function DataTable<T>({ columns, data, pageSize, className, headerClassName, rowClassName, cellClassName, onRowClick, isPagination, countPosition, paginationPosition, rowKey, }: DataTableProps<T>): react_jsx_runtime.JSX.Element;
+declare function DataTable<T>({ columns, data, pageSize, className, headerClassName, rowClassName, cellClassName, onRowClick, isPagination, countPosition, paginationPosition, pageSizePosition, rowKey, }: DataTableProps<T>): react_jsx_runtime.JSX.Element;
 
 declare const alert: {
     success: (t: string) => Promise<sweetalert2.SweetAlertResult<any>>;

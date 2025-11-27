@@ -187,7 +187,7 @@ const CustomSelect = <
 
   /* --------------------- FORM CONTROL --------------------- */
 
-  const content = control ? (
+  const content = (name && control) ? (
     <Controller
       name={name}
       control={control}

@@ -16,7 +16,7 @@ export type Option = {
 };
 
 export type CustomSelectBaseProps<TFieldValues extends FieldValues = FieldValues> = {
-  name: Path<TFieldValues>;
+  name?: Path<TFieldValues>;
   label?: string;
   labelPosition?: LabelPosition;
   options: Option[];

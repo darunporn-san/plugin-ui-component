@@ -9,6 +9,15 @@ import {
 } from "../ui/table";
 import { CustomPagination } from "./data-table/custom-pagination";
 import { CustomCountTable } from "./data-table/custom-count-table";
+import { CustomSelect } from "./custom-select";
+
+const countryOptions = [
+  { value: "th", label: "Thailand" },
+  { value: "us", label: "United States" },
+  { value: "uk", label: "United Kingdom" },
+  { value: "jp", label: "Japan" },
+  { value: "kr", label: "South Korea" },
+];
 
 export interface Column<T> {
   header: string;
@@ -16,7 +25,7 @@ export interface Column<T> {
   className?: string;
 }
 
-type Position = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
+type Position = "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
 
 export interface DataTableProps<T> {
   columns: Column<T>[];
@@ -30,6 +39,7 @@ export interface DataTableProps<T> {
   isPagination?: boolean;
   countPosition?: Position;
   paginationPosition?: Position;
+  pageSizePosition?: Position;
   rowKey?: keyof T | ((row: T) => React.Key);
 }
 
@@ -43,9 +53,10 @@ export function DataTable<T>({
   cellClassName = "",
   onRowClick,
   isPagination = true,
-  countPosition = 'bottomLeft',
-  paginationPosition = 'bottomRight',
-  rowKey = 'id' as keyof T,
+  countPosition = "bottomLeft",
+  paginationPosition = "bottomRight",
+  pageSizePosition = "topLeft",
+  rowKey = "id" as keyof T,
 }: DataTableProps<T>) {
   const [currentPage, setCurrentPage] = React.useState(1);
   const totalPages = Math.ceil(data.length / pageSize);
@@ -68,65 +79,69 @@ export function DataTable<T>({
     return String(row[column.accessor as keyof T] ?? "");
   };
 
-  const renderControl = (type: 'count' | 'pagination') => {
-    const Component = type === 'count' ? 
-      <CustomCountTable currentPage={currentPage} totalPages={totalPages} pageSize={pageSize} /> :
-      <CustomPagination
-        currentPage={currentPage}
-        pageSize={pageSize}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />;
-
-    return (
-      <div className="flex-1">
-        {Component}
-      </div>
-    );
+  const renderControl = (type: "count" | "pagination" | "pageSize") => {
+    const Component =
+      type === "count" ? (
+        <CustomCountTable
+          currentPage={currentPage}
+          totalPages={totalPages}
+          pageSize={pageSize}
+        />
+      ) : type === "pagination" ? (
+        <CustomPagination
+          currentPage={currentPage}
+          pageSize={pageSize}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      ) : (
+        <CustomSelect options={countryOptions} />
+      );
+    return <div className="flex-1">{Component}</div>;
   };
 
   const renderControls = (position: Position) => {
-    const controls = [];
-    
-    if (isPagination) {
-      if (countPosition === position) {
-        controls.push(renderControl('count'));
-      }
-      if (paginationPosition === position) {
-        controls.push(renderControl('pagination'));
-      }
-    }
+    const showCount = isPagination && countPosition === position;
+    const showPagination = isPagination && paginationPosition === position;
+    const showPageSize = isPagination && pageSizePosition === position;
 
-    if (controls.length === 0) return null;
-    
+    if (!showCount && !showPagination && !showPageSize) return null;
+
     return (
-      <div className={`flex-1 ${position.includes('Right') ? 'flex justify-end' : 'flex justify-start'}`}>
+      <div
+        className={`flex-1 ${position.includes("Right") ? "flex justify-end" : "flex justify-start"}`}
+      >
         <div className="flex items-center gap-2">
-          {controls}
+          {showCount && renderControl("count")}
+          {showPagination && renderControl("pagination")}
+          {showPageSize && renderControl("pageSize")}
         </div>
       </div>
     );
   };
 
-  const hasTopControls = isPagination && (
-    countPosition.startsWith('top') || 
-    paginationPosition.startsWith('top')
-  );
+  const hasTopControls =
+    isPagination &&
+    (countPosition.startsWith("top") || paginationPosition.startsWith("top") || pageSizePosition.startsWith("top"));
 
-  const hasBottomControls = isPagination && (
-    countPosition.startsWith('bottom') || 
-    paginationPosition.startsWith('bottom')
-  );
+  const hasBottomControls =
+    isPagination &&
+    (countPosition.startsWith("bottom") ||
+      paginationPosition.startsWith("bottom") ||
+      pageSizePosition.startsWith("bottom"));
+
 
   return (
     <div className={`flex flex-col ${className}`}>
-      {hasTopControls && (
-        <div className="flex w-full">
-          {renderControls('topLeft')}
-          {renderControls('topRight')}
-        </div>
-      )}
-      
+      <div className="flex w-full items-center justify-between mb-4">
+        {hasTopControls && (
+          <div className="flex">
+            {renderControls("topLeft")}
+            {renderControls("topRight")}
+          </div>
+        )}
+      </div>
+
       <div className="rounded-md border">
         <Table>
           <TableHeader className={headerClassName}>
@@ -141,27 +156,28 @@ export function DataTable<T>({
           <TableBody>
             {currentData.length > 0 ? (
               currentData.map((row, rowIndex) => {
-                const key: React.Key = typeof rowKey === 'function' 
-                  ? rowKey(row)
-                  : (row[rowKey] as React.Key) ?? rowIndex;
-                
+                const key: React.Key =
+                  typeof rowKey === "function"
+                    ? rowKey(row)
+                    : ((row[rowKey] as React.Key) ?? rowIndex);
+
                 return (
-                <TableRow
-                  key={key}
-                  className={`${rowClassName} ${
-                    onRowClick ? "cursor-pointer hover:bg-muted/50" : ""
-                  }`}
-                  onClick={() => onRowClick?.(row)}
-                >
-                  {columns.map((column, colIndex) => (
-                    <TableCell 
-                      key={`${key}-${colIndex}`} 
-                      className={cellClassName}
-                    >
-                      {renderCell(row, column)}
-                    </TableCell>
-                  ))}
-                </TableRow>
+                  <TableRow
+                    key={key}
+                    className={`${rowClassName} ${
+                      onRowClick ? "cursor-pointer hover:bg-muted/50" : ""
+                    }`}
+                    onClick={() => onRowClick?.(row)}
+                  >
+                    {columns.map((column, colIndex) => (
+                      <TableCell
+                        key={`${key}-${colIndex}`}
+                        className={cellClassName}
+                      >
+                        {renderCell(row, column)}
+                      </TableCell>
+                    ))}
+                  </TableRow>
                 );
               })
             ) : (
@@ -180,8 +196,8 @@ export function DataTable<T>({
 
       {hasBottomControls && (
         <div className="flex w-full">
-          {renderControls('bottomLeft')}
-          {renderControls('bottomRight')}
+          {renderControls("bottomLeft")}
+          {renderControls("bottomRight")}
         </div>
       )}
     </div>
