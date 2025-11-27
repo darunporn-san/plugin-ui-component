@@ -254,7 +254,7 @@ const CustomCalendar = React.forwardRef<
               <Button variant="outline" onClick={handleReset}>
                 Reset
               </Button>
-              <Button variant="outline" onClick={handleApply}>
+              <Button variant="default" onClick={handleApply}>
                 Apply
               </Button>
             </div>

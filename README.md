@@ -172,3 +172,43 @@ npm publish --access public
 
 
 # plugin-ui-component
+# UI Plugin Components
+
+## 1️⃣ Form Components (ฟอร์มพื้นฐาน)
+- **Input + Textarea** – ใช้กรอกข้อความ (มีแล้ว)
+- **Select / Dropdown / Combobox** – เลือกตัวเลือก, searchable ได้ (มีแล้ว แต่ขาด searchable อาจจะต้องเปลี่ยนเป็น react-select แทน)
+- **Checkbox** – ใช้เลือกหลายค่า (มีแล้ว)
+- **RadioGroup** – เลือกค่าเดียวจากหลายตัวเลือก (มีแล้ว)
+- **Switch / Toggle** – สำหรับเปิด/ปิด setting
+- **File Upload** – อัปโหลดไฟล์, drag & drop, preview
+- **FormField Wrapper** – wrapper สำหรับฟอร์ม, auto label + error + react-hook-form integration (มีแล้ว)
+
+## 2️⃣ Display Components (แสดงข้อมูล)
+- **Badge / Tag** – แสดงสถานะ, pill style, ใส่ไอคอนได้
+- **Avatar** – รูปผู้ใช้, fallback, ขนาดต่าง ๆ
+- **EmptyState** – หน้าเปล่าเมื่อไม่มีข้อมูล, icon + ข้อความ + ปุ่ม action
+- **Table Wrapper** – ตารางข้อมูล, pagination, sorting, sticky header
+
+## 3️⃣ Navigation & Layout (นำทางและจัด layout)
+- **PageHeader** – header หน้าเพจ, title + description + action button
+- **Card / Section Wrapper** – กล่องเนื้อหา, padding, shadow, header + content
+- **Tabs / Accordion** – แท็บสลับเนื้อหา, collapsible section
+
+## 4️⃣ Feedback & Interaction (แจ้งผลและตอบสนองผู้ใช้)
+- **Button** – ปุ่ม action ต่าง ๆ (มีแล้ว)
+- **Modal / Dialog Wrapper** – dialog, title + description + footer buttons + loading
+- **Toast / Notification** – แจ้งเตือน success / error / info
+- **Loading Spinner / Skeleton** – แสดง loading ระดับหน้าเพจหรือ component
+
+## 5️⃣ Advanced Patterns / Utilities (ลวดลายซับซ้อน / เครื่องมือช่วย)
+- **SearchBar** – ช่องค้นหา, icon, debounce
+- **Filter Panel / Drawer** – panel กรองข้อมูล, multi-select / range / tags
+- **DataSummary / Stats Card** – แสดงสรุปข้อมูล, total, analytics
+
+---
+
+## 🔹 คำแนะนำลำดับการทำ
+1. **ฟอร์มสำคัญ:** RadioGroup + Switch  
+2. **แจ้งผล/โต้ตอบผู้ใช้:** Modal + Toast  
+3. **Input enhancement:** File Upload + Autocomplete  
+4. **แสดงข้อมูล:** Table Wrapper + EmptyState

@@ -19,6 +19,8 @@ type CheckboxOption = {
   disabled?: boolean;
 };
 
+type InputType = 'checkbox' | 'radio';
+
 type CustomCheckboxBaseProps<TFieldValues extends FieldValues = FieldValues> = {
   name: Path<TFieldValues>;
   label?: string;
@@ -28,6 +30,7 @@ type CustomCheckboxBaseProps<TFieldValues extends FieldValues = FieldValues> = {
   wrapperClassName?: string;
   labelClassName?: string;
   errorClassName?: string;
+  type?: InputType;
   control?: any;
   required?: boolean | string;
   disabled?: boolean;
@@ -53,6 +56,7 @@ const CustomCheckbox = <TFieldValues extends FieldValues = FieldValues>({
   required,
   disabled = false,
   className,
+  type = 'checkbox',
   onCheckedChange,
   // Group specific props
   options,
@@ -139,7 +143,9 @@ const CustomCheckbox = <TFieldValues extends FieldValues = FieldValues>({
           )}
         >
           {options!.map((option) => {
-            const isChecked = field?.value?.includes(option.value) || false;
+            const isChecked = Array.isArray(field.value)
+              ? field.value.includes(option.value)
+              : field.value === option.value;
             const isOptionDisabled = disabled || option.disabled;
 
             return (
@@ -152,22 +158,62 @@ const CustomCheckbox = <TFieldValues extends FieldValues = FieldValues>({
                     : "cursor-pointer"
                 )}
               >
-                <BaseCheckbox
-                  id={`${name}-${option.value}`}
-                  checked={isChecked}
-                  onCheckedChange={(checked) =>
-                    handleGroupChange(field, option.value, checked === true)
-                  }
-                  disabled={isOptionDisabled}
-                  className={cn(
-                    "h-4 w-4 rounded border-2 border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground",
-                    errorMessage &&
-                      "border-destructive data-[state=checked]:bg-destructive",
-                    className
-                  )}
-                >
-                  <Check className="h-3 w-3" />
-                </BaseCheckbox>
+                <Controller
+                  name={name}
+                  control={control}
+                  rules={rules}
+                  render={({ field }) => {
+                    return type === 'radio' ? (
+                      <input
+                        type="radio"
+                        id={`${name}-${option.value}`}
+                        checked={isChecked}
+                        onChange={(e) => {
+                          const newValue = option.value;
+                          field.onChange(newValue);
+                          onCheckedChange?.([newValue]);
+                        }}
+                        disabled={option.disabled || disabled}
+                        className={cn(
+                          'h-4 w-4 rounded-full border-gray-300 text-primary focus:ring-primary',
+                          {
+                            'border-red-500': !!error,
+                          }
+                        )}
+                        {...props}
+                      />
+                    ) : (
+                      <BaseCheckbox
+                        id={`${name}-${option.value}`}
+                        checked={isChecked}
+                        onCheckedChange={(checked) => {
+                          let newValue: any;
+                          if (Array.isArray(field.value)) {
+                            if (checked) {
+                              newValue = [...field.value, option.value];
+                            } else {
+                              newValue = field.value.filter(
+                                (v: any) => v !== option.value
+                              );
+                            }
+                          } else {
+                            newValue = checked ? option.value : '';
+                          }
+                          field.onChange(newValue);
+                          onCheckedChange?.(newValue);
+                        }}
+                        disabled={option.disabled || disabled}
+                        className={cn(
+                          'h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary',
+                          {
+                            'border-red-500': !!error,
+                          }
+                        )}
+                        {...props}
+                      />
+                    );
+                  }}
+                />
                 <label
                   htmlFor={`${name}-${option.value}`}
                   className={cn(

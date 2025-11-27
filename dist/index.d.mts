@@ -106,6 +106,7 @@ type CheckboxOption = {
     label: string;
     disabled?: boolean;
 };
+type InputType = 'checkbox' | 'radio';
 type CustomCheckboxBaseProps<TFieldValues extends FieldValues = FieldValues> = {
     name: Path<TFieldValues>;
     label?: string;
@@ -115,6 +116,7 @@ type CustomCheckboxBaseProps<TFieldValues extends FieldValues = FieldValues> = {
     wrapperClassName?: string;
     labelClassName?: string;
     errorClassName?: string;
+    type?: InputType;
     control?: any;
     required?: boolean | string;
     disabled?: boolean;
@@ -125,7 +127,7 @@ type CustomCheckboxBaseProps<TFieldValues extends FieldValues = FieldValues> = {
     checked?: boolean;
 };
 declare const CustomCheckbox: {
-    <TFieldValues extends FieldValues = FieldValues>({ name, label, placeholder, rules, error: externalError, wrapperClassName, labelClassName, errorClassName, control: externalControl, required, disabled, className, onCheckedChange, options, direction, checked: externalChecked, ...props }: CustomCheckboxBaseProps<TFieldValues>): react_jsx_runtime.JSX.Element;
+    <TFieldValues extends FieldValues = FieldValues>({ name, label, placeholder, rules, error: externalError, wrapperClassName, labelClassName, errorClassName, control: externalControl, required, disabled, className, type, onCheckedChange, options, direction, checked: externalChecked, ...props }: CustomCheckboxBaseProps<TFieldValues>): react_jsx_runtime.JSX.Element;
     displayName: string;
 };
 
