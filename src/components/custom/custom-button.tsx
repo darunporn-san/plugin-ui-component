@@ -1,242 +1,111 @@
-import * as React from "react"
-import { cva } from "class-variance-authority"
-import { cn } from "@/lib/utils"
-import { Button } from "../ui/button"
-import { VisuallyHidden } from "../ui/visually-hidden"
-import { CustomButtonProps, CustomVariant } from "@/types/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog"
+import * as React from 'react';
+import { Slot } from '@radix-ui/react-slot';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { Loader2, Download } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { CustomButtonProps } from '@/types/button';
+import { buttonVariants } from '@/types/button';
 
-const customButtonVariants = cva("", {
-  variants: {
-    variant: {
-      primary: "bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600",
-      secondary: "bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600",
-      success: "bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600",
-      warning: "bg-gradient-to-r from-amber-400 to-orange-500 text-white hover:from-amber-500 hover:to-orange-600",
-      danger: "bg-gradient-to-r from-red-500 to-rose-500 text-white hover:from-red-600 hover:to-rose-600",
-      outline: "border border-input hover:bg-accent hover:text-accent-foreground",
-      ghost: "hover:bg-accent hover:text-accent-foreground",
-      link: "underline-offset-4 hover:underline text-primary",
-    },
-    size: {
-      sm: "h-9 px-3 text-sm",
-      default: "h-10 py-2 px-4",
-      lg: "h-11 px-8 text-lg",
-      xl: "h-14 px-10 text-xl",
-      icon: "h-10 w-10",
-    },
-    rounded: {
-      none: "rounded-none",
-      sm: "rounded-sm",
-      md: "rounded-md",
-      lg: "rounded-lg",
-      xl: "rounded-xl",
-      full: "rounded-full",
-    },
-    shadow: {
-      none: "shadow-none",
-      sm: "shadow-sm",
-      default: "shadow",
-      md: "shadow-md",
-      lg: "shadow-lg",
-      xl: "shadow-xl",
-      inner: "shadow-inner",
-    },
-  },
-  defaultVariants: {
-    variant: "primary",
-    size: "default",
-    rounded: "lg",
-    shadow: "default",
-  },
-})
 
 const CustomButton = React.forwardRef<HTMLButtonElement, CustomButtonProps>(
   (
     {
       className,
-      variant = 'default',
-      size = 'default',
-      rounded = 'lg',
-      shadow = 'default',
+      variant,
+      size,
       asChild = false,
       leftIcon,
       rightIcon,
       isLoading = false,
-      fullWidth = false,
-      children,
-      confirmTitle,
-      confirmMessage,
-      confirmActionText = "Confirm",
-      confirmCancelText = "Cancel",
-      onConfirm,
-      onCancel,
+      loadingText,
+      isExport = false,
+      exportData,
+      exportFilename = 'export',
       onClick,
-      disabled,
-      errors,
-      fetchErrors,
+      children,
       ...props
     },
     ref
   ) => {
-    const [showConfirm, setShowConfirm] = React.useState(false)
-    const [hasErrors, setHasErrors] = React.useState<boolean>(false)
-    const pendingActionRef = React.useRef<(() => void) | null>(null)
-
-    React.useEffect(() => {
-      let mounted = true
-
-      const checkErrors = async () => {
-        try {
-          if (fetchErrors) {
-            const fetched = await fetchErrors()
-            if (!mounted) return
-            setHasErrors(Boolean(fetched && Object.keys(fetched).length > 0))
-            return
-          }
-
-          setHasErrors(Boolean(errors && Object.keys(errors).length > 0))
-        } catch (err) {
-          if (!mounted) return
-          // If fetching errors fails, do not enable the button by default — keep as no-errors
-          setHasErrors(false)
-        }
-      }
-
-      checkErrors()
-
-      return () => {
-        mounted = false
-      }
-    }, [fetchErrors, errors])
-
-    const handleClose = React.useCallback(() => {
-      setShowConfirm(false)
-      pendingActionRef.current = null
-    }, [])
-
-    const handleCancel = React.useCallback(
-      (event: React.MouseEvent<HTMLElement>) => {
-        handleClose()
-        onCancel?.(event)
-      },
-      [handleClose, onCancel]
-    )
-
-    const handleConfirm = React.useCallback(
-      (event: React.MouseEvent<HTMLElement>) => {
-        const action = pendingActionRef.current
-        handleClose()
-        action?.()
-        onConfirm?.(event)
-      },
-      [handleClose, onConfirm]
-    )
-
-    const handleClick = React.useCallback(
-      async (event: React.MouseEvent<HTMLElement>) => {
-        if (isLoading || disabled || hasErrors) return
-
-        if ("persist" in event) event.persist()
-
-        let resolvedErrors = errors
-
-        if (fetchErrors) {
-          resolvedErrors = await fetchErrors()
-        }
-
-        console.log('errors', resolvedErrors);
-        
-        // 👉 ถ้ามี errors หรือ errors ไม่ว่าง {} → ไม่ต้องเปิด Dialog
-        if (resolvedErrors && Object.keys(resolvedErrors).length > 0) {
-          // If resolvedErrors exist at click-time, prevent any action (button is disabled in render),
-          // but keep existing behavior to call onClick if the consumer expects it.
-          // NOTE: we early-return to avoid confirmation dialog.
-          return
-        }
-    
-        if (confirmMessage || confirmTitle) {
-          event.preventDefault()
-          event.stopPropagation()
-    
-          pendingActionRef.current = () => {
-            onClick?.(event as React.MouseEvent<HTMLButtonElement>)
-          }
-          setShowConfirm(true)
-          return
-        }
-    
-        onClick?.(event as React.MouseEvent<HTMLButtonElement>)
-      },
-      [confirmMessage, confirmTitle, disabled, fetchErrors, isLoading, errors, onClick]
-    )
-    
-    return (
+    const Comp = asChild ? Slot : 'button';
+    const content = (
       <>
-        <Button
-          className={cn(
-            customButtonVariants({ variant: variant as CustomVariant, size, rounded, shadow }),
-            fullWidth && "w-full",
-            isLoading && "pointer-events-none opacity-70",
-            className
-          )}
-          ref={ref}
-          disabled={disabled || isLoading}
-          onClick={handleClick}
-          variant={variant === 'default' ? 'default' : (variant as any)}
-          size={size as any}
-          {...props}
-        >
-          {isLoading && (
-            <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-          )}
-          <span className={cn("flex items-center gap-2", isLoading && "invisible")}>
-            {leftIcon && <span className="flex-shrink-0">{leftIcon}</span>}
-            {children}
-            {rightIcon && <span className="flex-shrink-0">{rightIcon}</span>}
+        {isLoading && (
+          <span className="absolute inset-0 flex items-center justify-center bg-inherit">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            {loadingText && <span className="ml-2">{loadingText}</span>}
           </span>
-        </Button>
-        <Dialog open={showConfirm} onOpenChange={setShowConfirm}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle asChild={!confirmTitle}>
-                {confirmTitle ? (
-                  <span>{confirmTitle}</span>
-                ) : (
-                  <VisuallyHidden>Confirmation</VisuallyHidden>
-                )}
-              </DialogTitle>
-              <DialogDescription id="custom-button-confirm-description">
-                {confirmMessage ?? "Are you sure you want to continue?"}
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="mt-6">
-              <Button
-                variant="outline"
-                onClick={(event) => handleCancel(event as React.MouseEvent<HTMLElement>)}
-              >
-                {confirmCancelText}
-              </Button>
-              <Button
-                onClick={(event) => handleConfirm(event as React.MouseEvent<HTMLElement>)}
-              >
-                {confirmActionText}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        )}
+        <span className={cn('flex items-center gap-2', isLoading && 'invisible')}>
+          {leftIcon && <span>{leftIcon}</span>}
+          {children}
+          {rightIcon && <span>{rightIcon}</span>}
+        </span>
       </>
-    )
+    );
+
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (isExport && exportData) {
+        e.preventDefault();
+        
+        if (exportData instanceof Blob) {
+          // Handle Blob data
+          const url = window.URL.createObjectURL(exportData);
+          downloadFile(url, exportFilename);
+        } else if (typeof exportData === 'string') {
+          // Handle URL string
+          downloadFile(exportData, exportFilename);
+        }
+      }
+
+      // Call the original onClick handler if provided
+      if (onClick) {
+        onClick(e);
+      }
+    };
+
+    const downloadFile = (url: string, filename: string) => {
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Clean up the URL object if it was created from a Blob
+      if (exportData instanceof Blob) {
+        window.URL.revokeObjectURL(url);
+      }
+    };
+
+    // Add download icon if isExport is true and no left/right icon is provided
+    const exportIcon = isExport && !leftIcon && !rightIcon ? <Download className="h-4 w-4" /> : null;
+    const buttonContent = exportIcon ? (
+      <span className={cn('flex items-center gap-2', isLoading && 'invisible')}>
+        {exportIcon}
+        {children}
+      </span>
+    ) : content;
+
+    return (
+      <Comp
+        ref={ref}
+        className={cn(
+          buttonVariants({ variant, size, className, isLoading }),
+          'relative transition-all duration-200 ease-in-out',
+          variant === 'custom' && 'hover:scale-[1.02] focus:scale-[1.02]',
+          isExport && 'cursor-pointer'
+        )}
+        disabled={isLoading || props.disabled}
+        onClick={handleClick}
+        {...props}
+      >
+        {buttonContent}
+      </Comp>
+    );
   }
-)
+);
 
-CustomButton.displayName = "CustomButton"
+CustomButton.displayName = 'CustomButton';
 
-export { CustomButton, customButtonVariants }
+export { CustomButton, buttonVariants };

@@ -120,7 +120,7 @@ const CustomCalendar = React.forwardRef<
     // Sync states when externalSelected changes
     React.useEffect(() => {
       setDate(externalSelected);
-      console.log("externalSelected", externalSelected);
+      // console.log("externalSelected", externalSelected);
 
       if (mode === "range") {
         setTempDate(

@@ -7,7 +7,7 @@ export interface CustomCalendarProps<T extends FieldValues> {
   onSelect?: (value: Date | DateRange | undefined) => void;
   label?: string;
   mode?: "single" | "range";
-  control?: Control<T>;
+  control?: any;
   name?: Path<T>;
   error?: FieldError;
   required?: boolean;
