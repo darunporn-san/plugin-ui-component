@@ -5,13 +5,15 @@ export * from "./components/custom/custom-checkbox";
 export * from "./components/custom/custom-calendar";
 export * from "./components/custom/custom-dropdown-menu";
 export * from "./components/custom/file-upload";
-
+export * from "./components/custom/custom-data-table";
 // Export utilities
 export * from "./lib/alert";
 
 // Export common types
 export type { CustomButtonProps } from "@/types/button"
 export type { FileUploadProps } from "@/types/file-upload"
+export type { Column } from "./components/custom/custom-data-table";
+
 
 // Import global styles
 import './styles/globals.css';

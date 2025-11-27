@@ -231,6 +231,28 @@ interface FileUploadProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'a
 
 declare const FileUpload: React$1.ForwardRefExoticComponent<FileUploadProps & React$1.RefAttributes<HTMLInputElement>>;
 
+interface Column<T> {
+    header: string;
+    accessor: keyof T | ((row: T) => React$1.ReactNode);
+    className?: string;
+}
+type Position = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
+interface DataTableProps<T> {
+    columns: Column<T>[];
+    data: T[];
+    pageSize?: number;
+    className?: string;
+    headerClassName?: string;
+    rowClassName?: string;
+    cellClassName?: string;
+    onRowClick?: (row: T) => void;
+    isPagination?: boolean;
+    countPosition?: Position;
+    paginationPosition?: Position;
+    rowKey?: keyof T | ((row: T) => React$1.Key);
+}
+declare function DataTable<T>({ columns, data, pageSize, className, headerClassName, rowClassName, cellClassName, onRowClick, isPagination, countPosition, paginationPosition, rowKey, }: DataTableProps<T>): react_jsx_runtime.JSX.Element;
+
 declare const alert: {
     success: (t: string) => Promise<sweetalert2.SweetAlertResult<any>>;
     error: (t: string) => Promise<sweetalert2.SweetAlertResult<any>>;
@@ -238,4 +260,4 @@ declare const alert: {
     confirm: (o: any) => Promise<sweetalert2.SweetAlertResult<any>>;
 };
 
-export { type CheckboxOption, CustomButton, type CustomButtonProps, CustomCalendar, CustomCheckbox, CustomDropdownMenu, CustomInput, CustomSelect, FileUpload, type FileUploadProps, type FileWithPreview, type Option as SelectOption, alert, buttonVariants };
+export { type CheckboxOption, type Column, CustomButton, type CustomButtonProps, CustomCalendar, CustomCheckbox, CustomDropdownMenu, CustomInput, CustomSelect, DataTable, type DataTableProps, FileUpload, type FileUploadProps, type FileWithPreview, type Option as SelectOption, alert, buttonVariants };
