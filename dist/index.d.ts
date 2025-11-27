@@ -5,6 +5,7 @@ import { VariantProps } from 'class-variance-authority';
 import { FieldValues, Path, RegisterOptions, FieldError, Merge, FieldErrorsImpl } from 'react-hook-form';
 import * as react_jsx_runtime from 'react/jsx-runtime';
 import { DateRange } from 'react-day-picker';
+import { Accept } from 'react-dropzone';
 
 declare const buttonVariants: (props?: ({
     variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | null | undefined;
@@ -182,4 +183,49 @@ type DropdownMenuProps = {
  */
 declare const CustomDropdownMenu: React.ForwardRefExoticComponent<DropdownMenuProps & React.RefAttributes<HTMLButtonElement>>;
 
-export { type CheckboxOption, CustomButton, type CustomButtonProps, CustomCalendar, CustomCheckbox, CustomDropdownMenu, CustomInput, CustomSelect, type CustomSelectBaseProps, type CustomSelectProps, type Option, type Option as SelectOption, customButtonVariants };
+type FileWithPreview = File & {
+    preview: string;
+    path: string;
+};
+interface FileUploadProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'accept'> {
+    /**
+     * The maximum file size in bytes (default: 5MB)
+     */
+    maxSize?: number;
+    /**
+     * The maximum number of files to accept (default: 1)
+     */
+    maxFiles?: number;
+    /**
+     * The accepted file types (e.g., { 'image/*': [] }, { 'application/pdf': ['.pdf'] })
+     * @default { 'image/*': [] }
+     */
+    accept?: Accept | string | undefined;
+    /**
+     * Callback when files are selected
+     */
+    onFilesSelected?: (files: FileWithPreview[]) => void;
+    /**
+     * Whether to show the file list (default: true)
+     */
+    showFileList?: boolean;
+    /**
+     * Whether the upload is in progress
+     */
+    isUploading?: boolean;
+    /**
+     * Custom upload button text
+     */
+    uploadButtonText?: string;
+    /**
+     * Custom dropzone text
+     */
+    dropzoneText?: string;
+    /**
+     * Custom dropzone active text
+     */
+    dropzoneActiveText?: string;
+}
+declare const FileUpload: React.ForwardRefExoticComponent<FileUploadProps & React.RefAttributes<HTMLInputElement>>;
+
+export { type CheckboxOption, CustomButton, type CustomButtonProps, CustomCalendar, CustomCheckbox, CustomDropdownMenu, CustomInput, CustomSelect, type CustomSelectBaseProps, type CustomSelectProps, FileUpload, type FileUploadProps, type Option, type Option as SelectOption, customButtonVariants };
