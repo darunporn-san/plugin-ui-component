@@ -3,6 +3,7 @@
 import * as React from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
+import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar as BaseCalendar } from "@/components/ui/calendar";
@@ -11,41 +12,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { DateRange } from "react-day-picker";
-import {
-  Control,
-  Controller,
-  FieldValues,
-  Path,
-  FieldError,
-} from "react-hook-form";
-
-interface CustomCalendarProps<T extends FieldValues> {
-  className?: string;
-  selected?: Date | DateRange;
-  onSelect?: (value: Date | DateRange | undefined) => void;
-  label?: string;
-  mode?: "single" | "range";
-  control?: any;
-  name?: Path<T>;
-  error?: FieldError;
-  required?: boolean;
-  disabled?: boolean;
-}
-
-// 💡 Combined Wrapper + Popover Component
-interface CalendarBoxProps {
-  ref?: React.Ref<HTMLDivElement>;
-  className?: string;
-  label?: string;
-  required?: boolean;
-  error?: FieldError;
-  displayText: string;
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  children: React.ReactNode;
-  disabled?: boolean;
-}
+import { Controller } from "react-hook-form";
+import type { CustomCalendarProps, CalendarBoxProps } from "@/types/calendar";
 
 const CalendarBox = React.forwardRef<HTMLDivElement, CalendarBoxProps>(
   (
@@ -118,7 +86,7 @@ const CustomCalendar = React.forwardRef<
       disabled = false,
       ...rest
     },
-    ref
+    ref 
   ) => {
     const [open, setOpen] = React.useState(false);
     const [date, setDate] = React.useState<Date | DateRange | undefined>(

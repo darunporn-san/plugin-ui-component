@@ -1,9 +1,9 @@
 import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
+import { cva } from "class-variance-authority"
 import { cn } from "@/lib/utils"
-import { Button, ButtonProps } from "../ui/button"
+import { Button } from "../ui/button"
 import { VisuallyHidden } from "../ui/visually-hidden"
+import { CustomButtonProps, CustomVariant } from "@/types/button"
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog"
-import type { FieldErrors } from "react-hook-form"
 
 const customButtonVariants = cva("", {
   variants: {
@@ -58,26 +57,6 @@ const customButtonVariants = cva("", {
     shadow: "default",
   },
 })
-
-type CustomVariant = 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'outline' | 'ghost' | 'link'
-
-export interface CustomButtonProps
-  extends Omit<ButtonProps, 'variant' | 'size'>,
-    VariantProps<typeof customButtonVariants> {
-  asChild?: boolean
-  leftIcon?: React.ReactNode
-  rightIcon?: React.ReactNode
-  isLoading?: boolean
-  fullWidth?: boolean
-  confirmTitle?: React.ReactNode
-  confirmMessage?: React.ReactNode
-  confirmActionText?: React.ReactNode
-  confirmCancelText?: React.ReactNode
-  onConfirm?: (event: React.MouseEvent<HTMLElement>) => void
-  onCancel?: (event: React.MouseEvent<HTMLElement>) => void
-  errors?: any
-  fetchErrors?: () => Promise<any>
-}
 
 const CustomButton = React.forwardRef<HTMLButtonElement, CustomButtonProps>(
   (

@@ -2,10 +2,6 @@ import * as React from "react";
 import {
   useFormContext,
   Controller,
-  FieldError,
-  FieldErrorsImpl,
-  Merge,
-  RegisterOptions,
   ControllerRenderProps,
   FieldValues,
   FieldPath,
@@ -18,63 +14,7 @@ import type { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 import { buildValidationRules, LengthRule } from "@/utils/validation-rules";
 import { useEffect, useRef, useState } from "react";
-
-// Omit the conflicting props from InputHTMLAttributes
-// Separate our custom props from native input props
-type LabelPosition = 'top' | 'left' | 'right';
-
-type CustomInputBaseProps<TFieldValues extends FieldValues = FieldValues> = {
-  name: Path<TFieldValues>;
-  label?: string;
-  labelPosition?: LabelPosition;
-  rules?: RegisterOptions<TFieldValues, Path<TFieldValues>>;
-  error?: string | FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
-  wrapperClassName?: string;
-  labelClassName?: string;
-  errorClassName?: string;
-  control?: any;
-  required?: boolean | string;
-  minLength?: LengthRule;
-  maxLength?: LengthRule;
-  pattern?: { value: RegExp; message: string };
-  type?:
-    | "text"
-    | "email"
-    | "password"
-    | "number"
-    | "tel"
-    | "url"
-    | "search"
-    | "textarea"
-    | string;
-  [key: string]: any; // Allow any other props
-};
-
-// Create the full props type by combining with HTML input props, omitting conflicting ones
-type CustomInputProps<TFieldValues extends FieldValues = FieldValues> =
-  CustomInputBaseProps<TFieldValues> &
-    Omit<
-      InputHTMLAttributes<HTMLInputElement>,
-      | keyof CustomInputBaseProps<TFieldValues>
-      | "name"
-      | "minLength"
-      | "maxLength"
-      | "required"
-      | "pattern"
-      | "type"
-    > & {
-      // Add back the type prop with a more specific type
-      type?:
-        | "text"
-        | "email"
-        | "password"
-        | "number"
-        | "tel"
-        | "url"
-        | "search"
-        | "textarea"
-        | string;
-    };
+import type { CustomInputProps, LabelPosition } from "@/types/input";
 
 // Validation rules are now imported from validation-rules.ts
 

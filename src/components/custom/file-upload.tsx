@@ -1,56 +1,13 @@
 import * as React from "react"
 import { useCallback, useState } from "react"
-import { useDropzone, type Accept } from "react-dropzone"
+import { useDropzone } from "react-dropzone"
 import { cn } from "@/lib/utils"
 import { Upload, File, X, Loader2 } from "lucide-react"
 import { CustomButton } from "./custom-button"
 import { Button } from "@/components/ui/button"
+import type { FileWithPreview, FileUploadProps } from "@/types/file-upload"
 
-type FileWithPreview = File & {
-  preview: string
-  path: string
-}
-
-export interface FileUploadProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'accept'> {
-  /**
-   * The maximum file size in bytes (default: 5MB)
-   */
-  maxSize?: number
-  /**
-   * The maximum number of files to accept (default: 1)
-   */
-  maxFiles?: number
-  /**
-   * The accepted file types (e.g., { 'image/*': [] }, { 'application/pdf': ['.pdf'] })
-   * @default { 'image/*': [] }
-   */
-  accept?: Accept | string | undefined
-  /**
-   * Callback when files are selected
-   */
-  onFilesSelected?: (files: FileWithPreview[]) => void
-  /**
-   * Whether to show the file list (default: true)
-   */
-  showFileList?: boolean
-  /**
-   * Whether the upload is in progress
-   */
-  isUploading?: boolean
-  /**
-   * Custom upload button text
-   */
-  uploadButtonText?: string
-  /**
-   * Custom dropzone text
-   */
-  dropzoneText?: string
-  /**
-   * Custom dropzone active text
-   */
-  dropzoneActiveText?: string
-}
+export { type FileWithPreview, type FileUploadProps } from "@/types/file-upload"
 
 const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
   ({
@@ -58,7 +15,7 @@ const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
     accept = {
       'image/*': ['.png', '.jpg', '.jpeg', '.gif'],
       'application/pdf': ['.pdf']
-    },
+    } as const,
     maxSize = 5 * 1024 * 1024, // 5MB
     maxFiles = 5, // Allow up to 5 files by default
     onFilesSelected,
