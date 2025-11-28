@@ -66,6 +66,7 @@ type Option = {
     disabled?: boolean;
 };
 type CustomSelectBaseProps<TFieldValues extends FieldValues = FieldValues> = {
+    name?: Path<TFieldValues>;
     label?: string;
     labelPosition?: LabelPosition;
     options: Option[];
@@ -80,6 +81,7 @@ type CustomSelectBaseProps<TFieldValues extends FieldValues = FieldValues> = {
     disabled?: boolean;
     className?: string;
     onValueChange?: (value: string) => void;
+    isClearable?: boolean;
     [key: string]: any;
 };
 type CustomSelectProps<TFieldValues extends FieldValues = FieldValues> = CustomSelectBaseProps<TFieldValues> & {
@@ -89,7 +91,7 @@ type CustomSelectProps<TFieldValues extends FieldValues = FieldValues> = CustomS
 };
 
 declare const CustomSelect: {
-    <TFieldValues extends FieldValues = FieldValues>({ name, label, labelPosition, options, placeholder, rules, error: externalError, wrapperClassName, labelClassName, errorClassName, control: externalControl, required, disabled, className, onValueChange, value: externalValue, onChange: externalOnChange, }: CustomSelectProps<TFieldValues>): react_jsx_runtime.JSX.Element;
+    <TFieldValues extends FieldValues = FieldValues>({ name, label, labelPosition, options, placeholder, rules, error: externalError, wrapperClassName, labelClassName, errorClassName, control: externalControl, required, disabled, className, onValueChange, value: externalValue, onChange: externalOnChange, isClearable, }: CustomSelectProps<TFieldValues>): react_jsx_runtime.JSX.Element;
     displayName: string;
 };
 

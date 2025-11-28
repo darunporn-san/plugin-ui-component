@@ -1,19 +1,26 @@
-interface CustomPaginationProps {
+interface CustomCountTableProps {
   currentPage: number;
   totalPages: number;
-  pageSize?: number;
+  pageSize: number;
+  totalItems: number;
 }
+
 export function CustomCountTable({
   currentPage,
   totalPages,
   pageSize = 10,
-}: CustomPaginationProps) {
+  totalItems,
+}: CustomCountTableProps) {
+  const startItem = (currentPage - 1) * pageSize + 1;
+  const endItem = Math.min(currentPage * pageSize, totalItems);
+  
   return (
-    <>
-      {`${(currentPage - 1) * pageSize + 1}-${Math.min(
-        currentPage * pageSize,
-        totalPages * pageSize
-      )}`}
-    </>
+    <div className="text-sm text-muted-foreground">
+      {totalItems === 0 ? (
+        '0 items'
+      ) : (
+        `${startItem}-${endItem} of ${totalItems} ${totalItems === 1 ? 'item' : 'items'}`
+      )}
+    </div>
   );
 }

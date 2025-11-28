@@ -11,12 +11,12 @@ import { CustomPagination } from "./data-table/custom-pagination";
 import { CustomCountTable } from "./data-table/custom-count-table";
 import { CustomSelect } from "./custom-select";
 
-const countryOptions = [
-  { value: "th", label: "Thailand" },
-  { value: "us", label: "United States" },
-  { value: "uk", label: "United Kingdom" },
-  { value: "jp", label: "Japan" },
-  { value: "kr", label: "South Korea" },
+const pageSizeOptions = [
+  { value: "5", label: "5 / page" },
+  { value: "10", label: "10 / page" },
+  { value: "20", label: "20 / page" },
+  { value: "50", label: "50 / page" },
+  { value: "100", label: "100 / page" },
 ];
 
 export interface Column<T> {
@@ -59,17 +59,25 @@ export function DataTable<T>({
   rowKey = "id" as keyof T,
 }: DataTableProps<T>) {
   const [currentPage, setCurrentPage] = React.useState(1);
-  const totalPages = Math.ceil(data.length / pageSize);
+  const [selectedPageSize, setSelectedPageSize] = React.useState(pageSize);
+  const totalPages = Math.ceil(data.length / selectedPageSize);
 
   const currentData = React.useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize;
-    return data.slice(startIndex, startIndex + pageSize);
-  }, [data, currentPage, pageSize]);
+    const startIndex = (currentPage - 1) * selectedPageSize;
+    return data.slice(startIndex, startIndex + selectedPageSize);
+  }, [data, currentPage, selectedPageSize]);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
+  };
+
+  const handlePageSizeChange = (value: string) => {
+    const newPageSize = parseInt(value, 10);
+    setSelectedPageSize(newPageSize);
+    // Reset to first page when page size changes
+    setCurrentPage(1);
   };
 
   const renderCell = (row: T, column: Column<T>) => {
@@ -85,17 +93,24 @@ export function DataTable<T>({
         <CustomCountTable
           currentPage={currentPage}
           totalPages={totalPages}
-          pageSize={pageSize}
+          pageSize={selectedPageSize}
+          totalItems={data.length}
         />
       ) : type === "pagination" ? (
         <CustomPagination
           currentPage={currentPage}
-          pageSize={pageSize}
+          pageSize={selectedPageSize}
           totalPages={totalPages}
           onPageChange={handlePageChange}
         />
       ) : (
-        <CustomSelect options={countryOptions} />
+        <CustomSelect 
+          options={pageSizeOptions}
+          value={selectedPageSize.toString()}
+          onValueChange={handlePageSizeChange}
+          className="w-[120px]"
+          isClearable={false}
+        />
       );
     return <div className="flex-1">{Component}</div>;
   };

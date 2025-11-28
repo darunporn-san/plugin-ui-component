@@ -43,6 +43,7 @@ const CustomSelect = <
   onValueChange,
   value: externalValue,
   onChange: externalOnChange,
+  isClearable = true,
 }: CustomSelectProps<TFieldValues>) => {
   const formContext = useFormContext<TFieldValues>();
   const control = externalControl || formContext?.control;
@@ -149,7 +150,7 @@ const CustomSelect = <
           </SelectContent>
         </BaseSelect>
 
-        {hasValue && !disabled ? (
+        {hasValue && !disabled && isClearable ? (
           <button
             type="button"
             aria-label="Clear selection"
@@ -230,7 +231,7 @@ const CustomSelect = <
           </div>
           <div className={inputContainerClasses}>
             {content}
-            {renderError()}
+            {isClearable && renderError()}
           </div>
         </>
       ) : (
@@ -238,7 +239,7 @@ const CustomSelect = <
           {renderLabel()}
           <div className={inputContainerClasses}>
             {content}
-            {renderError()}
+            {isClearable && renderError()}
           </div>
         </>
       )}

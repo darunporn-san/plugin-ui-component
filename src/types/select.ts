@@ -31,6 +31,7 @@ export type CustomSelectBaseProps<TFieldValues extends FieldValues = FieldValues
   disabled?: boolean;
   className?: string;
   onValueChange?: (value: string) => void;
+  isClearable?: boolean;
   [key: string]: any; // Allow any other props
 };
 
