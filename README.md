@@ -180,7 +180,7 @@ npm publish --access public
 - **Checkbox** – ใช้เลือกหลายค่า (มีแล้ว)
 - **RadioGroup** – เลือกค่าเดียวจากหลายตัวเลือก (มีแล้ว)
 - **Switch / Toggle** – สำหรับเปิด/ปิด setting
-- **File Upload** – อัปโหลดไฟล์, drag & drop, preview
+- **File Upload** – อัปโหลดไฟล์, drag & drop, preview (มีแล้ว)
 - **FormField Wrapper** – wrapper สำหรับฟอร์ม, auto label + error + react-hook-form integration (มีแล้ว)
 
 ## 2️⃣ Display Components (แสดงข้อมูล)

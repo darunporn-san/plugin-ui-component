@@ -5,6 +5,7 @@ import { VariantProps } from 'class-variance-authority';
 import { FieldValues, Path, RegisterOptions, FieldError, Merge, FieldErrorsImpl } from 'react-hook-form';
 import * as react_jsx_runtime from 'react/jsx-runtime';
 import { DateRange } from 'react-day-picker';
+import * as TabsPrimitive from '@radix-ui/react-tabs';
 import * as sweetalert2 from 'sweetalert2';
 
 declare const buttonVariants: (props?: ({
@@ -259,6 +260,27 @@ interface DataTableProps<T> {
 }
 declare function DataTable<T>({ columns, data, pageSize, className, headerClassName, rowClassName, cellClassName, onRowClick, isPagination, countPosition, paginationPosition, pageSizePosition, rowKey, children, customContent, }: DataTableProps<T>): react_jsx_runtime.JSX.Element;
 
+declare const Tabs: React$1.ForwardRefExoticComponent<TabsPrimitive.TabsProps & React$1.RefAttributes<HTMLDivElement>>;
+
+type TabItem = {
+    value: string;
+    label: string;
+    disabled?: boolean;
+    icon?: React$1.ReactNode;
+};
+interface CustomTabsProps extends Omit<React$1.ComponentProps<typeof Tabs>, 'orientation'> {
+    tabs: TabItem[];
+    defaultValue?: string;
+    className?: string;
+    tabListClassName?: string;
+    tabTriggerClassName?: string;
+    tabContentClassName?: string;
+    children: React$1.ReactNode;
+    orientation?: 'horizontal' | 'vertical';
+}
+declare const CustomTabs: React$1.ForwardRefExoticComponent<Omit<CustomTabsProps, "ref"> & React$1.RefAttributes<HTMLDivElement>>;
+declare const CustomTabContent: React$1.ForwardRefExoticComponent<Omit<TabsPrimitive.TabsContentProps & React$1.RefAttributes<HTMLDivElement>, "ref"> & React$1.RefAttributes<HTMLDivElement>>;
+
 declare const alert: {
     success: (t: string) => Promise<sweetalert2.SweetAlertResult<any>>;
     error: (t: string) => Promise<sweetalert2.SweetAlertResult<any>>;
@@ -266,4 +288,4 @@ declare const alert: {
     confirm: (o: any) => Promise<sweetalert2.SweetAlertResult<any>>;
 };
 
-export { type CheckboxOption, type Column, CustomButton, type CustomButtonProps, CustomCalendar, CustomCheckbox, CustomDropdownMenu, CustomInput, CustomSelect, DataTable, type DataTableProps, FileUpload, type FileUploadProps, type FileWithPreview, type Option as SelectOption, alert, buttonVariants };
+export { type CheckboxOption, type Column, CustomButton, type CustomButtonProps, CustomCalendar, CustomCheckbox, CustomDropdownMenu, CustomInput, CustomSelect, CustomTabContent, CustomTabs, DataTable, type DataTableProps, FileUpload, type FileUploadProps, type FileWithPreview, type Option as SelectOption, alert, buttonVariants };

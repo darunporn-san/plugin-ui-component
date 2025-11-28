@@ -6,6 +6,7 @@ export * from "./components/custom/custom-calendar";
 export * from "./components/custom/custom-dropdown-menu";
 export * from "./components/custom/file-upload";
 export * from "./components/custom/custom-data-table";
+export * from "./components/custom/custom-tabs";
 // Export utilities
 export * from "./lib/alert";
 
