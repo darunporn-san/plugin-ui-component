@@ -228,7 +228,7 @@ export function DataTable<T>({
       </div>
 
       {hasBottomControls && (
-        <div className="flex w-full ">
+        <div className="flex w-full mt-2">
           {renderControls("bottomLeft")}
           {renderControls("bottomRight")}
         </div>

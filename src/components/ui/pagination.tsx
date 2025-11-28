@@ -88,7 +88,8 @@ const PaginationLink = ({
         variant: isActive ? "outline" : "ghost",
         size,
       }),
-      className
+      className,
+      'rounded-full'
     )}
     {...props}
   />
@@ -117,7 +118,7 @@ const PaginationNext = ({
   <PaginationLink
     aria-label="Go to next page"
     size="default"
-    className={cn("gap-1 pr-2.5", className)}
+    className={cn("gap-1 pr-2.5 rounded-full", className)}
     {...props}
   >
     <ChevronRightIcon className="h-4 w-4" />

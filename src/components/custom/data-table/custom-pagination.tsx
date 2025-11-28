@@ -52,7 +52,7 @@ export function CustomPagination({
             <PaginationLink
               isActive={page === currentPage}
               onClick={() => onPageChange(page)}
-              className="cursor-pointer"
+              className={`cursor-pointer rounded-full ${page === currentPage ? 'bg-primary text-white hover:bg-primary hover:text-white' : 'bg-transparent text-black'}`}
             >
               {page}
             </PaginationLink>
