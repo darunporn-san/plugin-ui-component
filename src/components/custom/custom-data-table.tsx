@@ -41,6 +41,10 @@ export interface DataTableProps<T> {
   paginationPosition?: Position;
   pageSizePosition?: Position;
   rowKey?: keyof T | ((row: T) => React.Key);
+  children?: React.ReactNode;
+  customContent?: {
+    [key in Position]?: React.ReactNode;
+  };
 }
 
 export function DataTable<T>({
@@ -57,6 +61,8 @@ export function DataTable<T>({
   paginationPosition = "bottomRight",
   pageSizePosition = "topLeft",
   rowKey = "id" as keyof T,
+  children,
+  customContent = {},
 }: DataTableProps<T>) {
   const [currentPage, setCurrentPage] = React.useState(1);
   const [selectedPageSize, setSelectedPageSize] = React.useState(pageSize);
@@ -119,17 +125,24 @@ export function DataTable<T>({
     const showCount = isPagination && countPosition === position;
     const showPagination = isPagination && paginationPosition === position;
     const showPageSize = isPagination && pageSizePosition === position;
+    const hasCustomContent = customContent && customContent[position];
 
-    if (!showCount && !showPagination && !showPageSize) return null;
+    if (!showCount && !showPagination && !showPageSize && !hasCustomContent) return null;
 
     return (
       <div
         className={`flex-1 ${position.includes("Right") ? "flex justify-end" : "flex justify-start"}`}
       >
         <div className="flex items-center gap-2">
-          {showCount && renderControl("count")}
-          {showPagination && renderControl("pagination")}
-          {showPageSize && renderControl("pageSize")}
+          {hasCustomContent ? (
+            customContent[position]
+          ) : (
+            <>
+              {showCount && renderControl("count")}
+              {showPagination && renderControl("pagination")}
+              {showPageSize && renderControl("pageSize")}
+            </>
+          )}
         </div>
       </div>
     );
@@ -137,20 +150,25 @@ export function DataTable<T>({
 
   const hasTopControls =
     isPagination &&
-    (countPosition.startsWith("top") || paginationPosition.startsWith("top") || pageSizePosition.startsWith("top"));
+    (countPosition.startsWith("top") || 
+     paginationPosition.startsWith("top") || 
+     pageSizePosition.startsWith("top") ||
+     (customContent && (customContent.topLeft || customContent.topRight)));
 
   const hasBottomControls =
     isPagination &&
     (countPosition.startsWith("bottom") ||
-      paginationPosition.startsWith("bottom") ||
-      pageSizePosition.startsWith("bottom"));
+     paginationPosition.startsWith("bottom") ||
+     pageSizePosition.startsWith("bottom") ||
+     (customContent && (customContent.bottomLeft || customContent.bottomRight)));
 
 
   return (
     <div className={`flex flex-col ${className}`}>
+      {children}
       <div className="flex w-full items-center justify-between mb-4">
         {hasTopControls && (
-          <div className="flex">
+          <div className="flex w-full">
             {renderControls("topLeft")}
             {renderControls("topRight")}
           </div>
@@ -210,7 +228,7 @@ export function DataTable<T>({
       </div>
 
       {hasBottomControls && (
-        <div className="flex w-full">
+        <div className="flex w-full ">
           {renderControls("bottomLeft")}
           {renderControls("bottomRight")}
         </div>

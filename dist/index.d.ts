@@ -252,8 +252,12 @@ interface DataTableProps<T> {
     paginationPosition?: Position;
     pageSizePosition?: Position;
     rowKey?: keyof T | ((row: T) => React$1.Key);
+    children?: React$1.ReactNode;
+    customContent?: {
+        [key in Position]?: React$1.ReactNode;
+    };
 }
-declare function DataTable<T>({ columns, data, pageSize, className, headerClassName, rowClassName, cellClassName, onRowClick, isPagination, countPosition, paginationPosition, pageSizePosition, rowKey, }: DataTableProps<T>): react_jsx_runtime.JSX.Element;
+declare function DataTable<T>({ columns, data, pageSize, className, headerClassName, rowClassName, cellClassName, onRowClick, isPagination, countPosition, paginationPosition, pageSizePosition, rowKey, children, customContent, }: DataTableProps<T>): react_jsx_runtime.JSX.Element;
 
 declare const alert: {
     success: (t: string) => Promise<sweetalert2.SweetAlertResult<any>>;
