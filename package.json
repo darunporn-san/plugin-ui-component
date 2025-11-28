@@ -14,7 +14,9 @@
     "watch": "tsup --watch --config tsup.config.ts",
     "lint": "eslint . --ext .ts,.tsx",
     "format": "prettier --write .",
-    "shadcn": "shadcn"
+    "shadcn": "shadcn",
+    "build-storybook": "storybook build"
+
   },
   "peerDependencies": {
     "react": "^19.0.0",
@@ -50,6 +52,7 @@
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "autoprefixer": "^10.4.16",
+    "chromatic": "^13.3.4",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.33.2",

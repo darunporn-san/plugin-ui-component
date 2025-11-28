@@ -1,0 +1,3 @@
+yarn run v1.22.22
+$ storybook build --output-dir=/tmp/chromatic--178228-E4rCTYH0Xrhj
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.
