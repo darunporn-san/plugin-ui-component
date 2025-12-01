@@ -7,9 +7,11 @@ export * from "./components/custom/custom-dropdown-menu";
 export * from "./components/custom/file-upload";
 export * from "./components/custom/custom-data-table";
 export * from "./components/custom/custom-tabs";
+
 // Export utilities
 export * from "./lib/alert";
-
+import http from "./utils/https";
+export { http };
 // Export common types
 export type { CustomButtonProps } from "@/types/button"
 export type { FileUploadProps } from "@/types/file-upload"

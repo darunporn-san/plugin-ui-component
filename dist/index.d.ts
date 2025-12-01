@@ -288,4 +288,23 @@ declare const alert: {
     confirm: (o: any) => Promise<sweetalert2.SweetAlertResult<any>>;
 };
 
-export { type CheckboxOption, type Column, CustomButton, type CustomButtonProps, CustomCalendar, CustomCheckbox, CustomDropdownMenu, CustomInput, CustomSelect, CustomTabContent, CustomTabs, DataTable, type DataTableProps, FileUpload, type FileUploadProps, type FileWithPreview, type Option as SelectOption, alert, buttonVariants };
+interface RequestOptions extends Omit<RequestInit, 'method' | 'body'> {
+    params?: Record<string, any>;
+    body?: any;
+}
+interface ApiResponse<T = any> {
+    data: T;
+    status: number;
+    statusText: string;
+    headers: Headers;
+    ok: boolean;
+}
+declare const http: {
+    get: <T>(url: string, options?: Omit<RequestOptions, "body">) => Promise<ApiResponse<T>>;
+    post: <T>(url: string, body?: any, options?: RequestOptions) => Promise<ApiResponse<T>>;
+    patch: <T>(url: string, body?: any, options?: RequestOptions) => Promise<ApiResponse<T>>;
+    put: <T>(url: string, body?: any, options?: RequestOptions) => Promise<ApiResponse<T>>;
+    delete: <T>(url: string, options?: RequestOptions) => Promise<ApiResponse<T>>;
+};
+
+export { type CheckboxOption, type Column, CustomButton, type CustomButtonProps, CustomCalendar, CustomCheckbox, CustomDropdownMenu, CustomInput, CustomSelect, CustomTabContent, CustomTabs, DataTable, type DataTableProps, FileUpload, type FileUploadProps, type FileWithPreview, type Option as SelectOption, alert, buttonVariants, http };

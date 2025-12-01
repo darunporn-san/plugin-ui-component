@@ -25,6 +25,11 @@ export function CustomPagination({
 }: CustomPaginationProps) {
 
   const getPageNumbers = (currentPage: number, totalPages: number): Array<number | string> => {
+    // If 4 or fewer pages, show all pages
+    if (totalPages <= 4) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
     const pages = new Set<number>();
     
     // Always add first page

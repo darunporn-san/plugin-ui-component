@@ -12,11 +12,11 @@ import { CustomCountTable } from "./data-table/custom-count-table";
 import { CustomSelect } from "./custom-select";
 
 const pageSizeOptions = [
-  { value: "5", label: "5 / page" },
-  { value: "10", label: "10 / page" },
-  { value: "20", label: "20 / page" },
-  { value: "50", label: "50 / page" },
-  { value: "100", label: "100 / page" },
+  { value: "1", label: "1 / page" },
+  { value: "2", label: "2 / page" },
+  { value: "4", label: "4 / page" },
+  { value: "6", label: "6 / page" },
+  { value: "8", label: "8 / page" },
 ];
 
 export interface Column<T> {
@@ -65,7 +65,7 @@ export function DataTable<T>({
   customContent = {},
 }: DataTableProps<T>) {
   const [currentPage, setCurrentPage] = React.useState(1);
-  const [selectedPageSize, setSelectedPageSize] = React.useState(pageSize);
+  const [selectedPageSize, setSelectedPageSize] = React.useState<number>(parseInt(pageSizeOptions[0]?.value));
   const totalPages = Math.ceil(data.length / selectedPageSize);
 
   const currentData = React.useMemo(() => {
