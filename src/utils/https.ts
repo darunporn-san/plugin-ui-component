@@ -3,6 +3,7 @@ type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE' | 'HEAD';
 interface RequestOptions extends Omit<RequestInit, 'method' | 'body'> {
   params?: Record<string, any>;
   body?: any;
+  skipAuth?: boolean; // Add this to skip auth for specific requests
 }
 
 interface ApiResponse<T = any> {
@@ -14,6 +15,12 @@ interface ApiResponse<T = any> {
 }
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+
+let authToken: string | null = null;
+
+export const setAuthToken = (token: string | null) => {
+  authToken = token;
+};
 
 const buildUrl = (url: string, params?: Record<string, any>): string => {
   let fullUrl = url.startsWith('http') ? url : `${BASE_URL}${url}`;
@@ -66,13 +73,20 @@ const request = async <T>(
 ): Promise<ApiResponse<T>> => {
   const { params, body, headers = {}, ...rest } = options;
   
+  // Initialize headers with proper type
+  const requestHeaders: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(headers as Record<string, string>),
+  };
+
+  // Add authorization header if token exists and not explicitly skipped
+  if (authToken && !options.skipAuth) {
+    requestHeaders['Authorization'] = `Bearer ${authToken}`;
+  }
+
   const config: RequestInit = {
     method,
-    headers: {
-      'Content-Type': 'application/json',
-      ...headers,
-    },
-    // credentials: 'include',
+    headers: requestHeaders,
     ...rest,
   };
   
@@ -107,6 +121,7 @@ export const del = <T>(url: string, options: RequestOptions = {}) =>
   request<T>('DELETE', url, options);
 
 const http = {
+  setAuthToken,
   get,
   post,
   patch,

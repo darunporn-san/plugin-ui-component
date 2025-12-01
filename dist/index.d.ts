@@ -291,6 +291,7 @@ declare const alert: {
 interface RequestOptions extends Omit<RequestInit, 'method' | 'body'> {
     params?: Record<string, any>;
     body?: any;
+    skipAuth?: boolean;
 }
 interface ApiResponse<T = any> {
     data: T;
@@ -300,6 +301,7 @@ interface ApiResponse<T = any> {
     ok: boolean;
 }
 declare const http: {
+    setAuthToken: (token: string | null) => void;
     get: <T>(url: string, options?: Omit<RequestOptions, "body">) => Promise<ApiResponse<T>>;
     post: <T>(url: string, body?: any, options?: RequestOptions) => Promise<ApiResponse<T>>;
     patch: <T>(url: string, body?: any, options?: RequestOptions) => Promise<ApiResponse<T>>;
