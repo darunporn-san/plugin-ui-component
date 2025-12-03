@@ -1,22 +1,10 @@
 import * as React from "react";
-import {
-  useFormContext,
-  Controller,
-  ControllerRenderProps,
-  FieldValues,
-  FieldPath,
-  Path,
-  PathValue,
-} from "react-hook-form";
+import { Controller, useFormContext, FieldValues, Path } from "react-hook-form";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
-import type { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
-import { buildValidationRules, LengthRule } from "@/utils/validation-rules";
-import { useEffect, useRef, useState } from "react";
-import type { CustomInputProps, LabelPosition } from "@/types/input";
-
-// Validation rules are now imported from validation-rules.ts
+import { buildValidationRules } from "@/utils/validation-rules";
+import type { CustomInputProps } from "@/types/input";
 
 const CustomInput = React.forwardRef<
   HTMLInputElement | HTMLTextAreaElement,
@@ -26,7 +14,7 @@ const CustomInput = React.forwardRef<
     {
       name,
       label,
-      labelPosition = 'top',
+      labelPosition = "top",
       type = "text",
       rules: rulesProp = {},
       className,
@@ -38,11 +26,17 @@ const CustomInput = React.forwardRef<
       minLength: minLengthProp,
       maxLength: maxLengthProp,
       pattern,
+      error: propError,
       ...props
     },
     ref
   ) => {
-    // Convert simplified props to react-hook-form rules
+    const context = useFormContext();
+    const control = controlProp || context?.control;
+
+    const errors = context?.formState?.errors || {};
+    const fieldError = errors[name] || propError;
+
     const rules = React.useMemo(
       () =>
         buildValidationRules({
@@ -54,12 +48,7 @@ const CustomInput = React.forwardRef<
         }),
       [rulesProp, required, minLengthProp, maxLengthProp, pattern]
     );
-    const context = useFormContext();
-    const control = controlProp || context?.control;
-    const errors = context?.formState?.errors || {};
-    const fieldError = errors[name] || props.error;
 
-    const wrapperRef = useRef<HTMLDivElement | null>(null);
     const renderLabel = () => (
       <label
         htmlFor={name}
@@ -67,95 +56,110 @@ const CustomInput = React.forwardRef<
           "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
           labelClassName,
           {
-            'block mb-1': labelPosition === 'top',
-            'inline-flex items-center mr-2 -translate-y-2': labelPosition === 'left',
-            'inline-flex items-center ml-2 -translate-y-2': labelPosition === 'right',
+            "block mb-1": labelPosition === "top",
+            "inline-flex items-center mr-2 -translate-y-2": labelPosition === "left",
+            "inline-flex items-center ml-2 -translate-y-2": labelPosition === "right",
           }
         )}
       >
         {label}
-        {rules?.required && (
-          <span className="text-destructive ml-1">*</span>
-        )}
+        {rules?.required && <span className="text-destructive ml-1">*</span>}
       </label>
     );
 
-    const renderInput = () => (
-      <Controller
-        name={name as Path<FieldValues>}
-        control={control}
-        rules={rules}
-        render={({ field }) => {
-          const { ref: _, value = '', ...fieldProps } = field;
+    const [value, setValue] = React.useState('');
 
-          // Extract props that shouldn't be passed to the underlying input/textarea
-          const {
-            error: _error,
-            control: _control,
-            rules: _rules,
-            wrapperClassName: _wrapperClassName,
-            labelClassName: _labelClassName,
-            errorClassName: _errorClassName,
-            minLength: _minLength,
-            maxLength: _maxLength,
-            pattern: _pattern,
-            ...cleanProps
-          } = props;
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const newValue = e.target.value;
+      setValue(newValue);
+      props.onChange?.(e);
+    };
 
-          if (type === "textarea") {
-            return (
-              <Textarea
-                {...fieldProps}
-                {...cleanProps}
-                id={name}
-                value={value || ''}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                className={cn(
-                  fieldError &&
-                    "border-destructive focus-visible:ring-destructive",
-                  className
-                )}
-                ref={ref as React.Ref<HTMLTextAreaElement>}
-              />
-            );
-          }
-     
+    const renderInput = () => {
+      if (control) {
+        // ใช้ react-hook-form
+        return (
+          <Controller
+            name={name as Path<FieldValues>}
+            control={control}
+            rules={rules}
+            render={({ field }) => {
+              const { ref: _, value = "", ...fieldProps } = field;
 
+              const { error: _error, control: _c, ...cleanProps } = props;
+
+              if (type === "textarea") {
+                return (
+                  <Textarea
+                    {...fieldProps}
+                    {...cleanProps}
+                    id={name}
+                    value={value || ""}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    className={cn(
+                      fieldError && "border-destructive focus-visible:ring-destructive",
+                      className
+                    )}
+                    ref={ref as React.Ref<HTMLTextAreaElement>}
+                  />
+                );
+              }
+
+              return (
+                <Input
+                  {...fieldProps}
+                  {...cleanProps}
+                  type={type}
+                  id={name}
+                  value={value || ""}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  className={cn(
+                    fieldError && "border-destructive focus-visible:ring-destructive",
+                    className
+                  )}
+                  ref={ref as React.Ref<HTMLInputElement>}
+                />
+              );
+            }}
+          />
+        );
+      } else {
+        // Render without react-hook-form
+        if (type === "textarea") {
           return (
-            <Input
-              {...fieldProps}
-              {...cleanProps}
-              type={type}
+            <Textarea
+              {...props}
               id={name}
-              value={value || ''}
-              onChange={field.onChange}
-              onBlur={field.onBlur}
-              className={cn(
-                fieldError &&
-                  "border-destructive focus-visible:ring-destructive",
-                className
-              )}
-              ref={ref as React.Ref<HTMLInputElement>}
+              value={value}
+              onChange={handleChange}
+              className={cn(className)}
+              ref={ref as React.Ref<HTMLTextAreaElement>}
             />
           );
-        }}
-      />
-    );
+        }
+        return (
+          <Input
+            id={name}
+            type={type}
+            {...props}
+            className={className}
+            ref={ref as React.Ref<HTMLInputElement>}
+          />
+        );
+      }
+    };
 
     return (
-      <div 
-        className={cn(
-          "w-full", 
-          wrapperClassName,
-          {
-            'space-y-1': labelPosition === 'top',
-            'flex items-center': labelPosition !== 'top',
-          }
-        )}
+      <div
+        className={cn("w-full", wrapperClassName, {
+          "space-y-1": labelPosition === "top",
+          "flex items-center": labelPosition !== "top",
+        })}
       >
-        {label && labelPosition !== 'right' && renderLabel()}
-        <div className={labelPosition !== 'top' ? 'flex-1' : 'w-full'}>
+        {label && labelPosition !== "right" && renderLabel()}
+        <div className={labelPosition !== "top" ? "flex-1" : "w-full"}>
           {renderInput()}
           <div className="relative h-5 mt-1">
             {fieldError && (
@@ -165,14 +169,14 @@ const CustomInput = React.forwardRef<
                   errorClassName
                 )}
               >
-                {typeof fieldError === 'string'
+                {typeof fieldError === "string"
                   ? fieldError
-                  : fieldError?.message?.toString() || 'Invalid field'}
+                  : fieldError?.message?.toString() || "Invalid field"}
               </p>
             )}
           </div>
         </div>
-        {label && labelPosition === 'right' && renderLabel()}
+        {label && labelPosition === "right" && renderLabel()}
       </div>
     );
   }
@@ -181,5 +185,4 @@ const CustomInput = React.forwardRef<
 CustomInput.displayName = "CustomInput";
 
 export { CustomInput };
-
 export default CustomInput;
