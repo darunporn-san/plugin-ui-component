@@ -65,9 +65,10 @@ export function DataTable<T>({
   customContent = {},
 }: DataTableProps<T>) {
   const [currentPage, setCurrentPage] = React.useState(1);
-  const [selectedPageSize, setSelectedPageSize] = React.useState<number>(parseInt(pageSizeOptions[0]?.value));
+  const [selectedPageSize, setSelectedPageSize] = React.useState<number>(pageSize ||parseInt(pageSizeOptions[0]?.value));
   const totalPages = Math.ceil(data.length / selectedPageSize);
-
+  console.log('pageSSize',pageSize);
+  
   const currentData = React.useMemo(() => {
     const startIndex = (currentPage - 1) * selectedPageSize;
     return data.slice(startIndex, startIndex + selectedPageSize);
