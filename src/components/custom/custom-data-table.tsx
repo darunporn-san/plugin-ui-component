@@ -87,7 +87,10 @@ export function DataTable<T>({
     setCurrentPage(1);
   };
 
-  const renderCell = (row: T, column: Column<T>) => {
+  const renderCell = (row: T, column: Column<T> & { cell?: (row: T) => React.ReactNode }) => {
+    if (column.cell) {
+      return column.cell(row);
+    }
     if (typeof column.accessor === "function") {
       return column.accessor(row);
     }
