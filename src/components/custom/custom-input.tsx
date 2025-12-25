@@ -67,14 +67,6 @@ const CustomInput = React.forwardRef<
       </label>
     );
 
-    const [value, setValue] = React.useState('');
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const newValue = e.target.value;
-      setValue(newValue);
-      props.onChange?.(e);
-    };
-
     const renderInput = () => {
       if (control) {
         // ใช้ react-hook-form
@@ -85,6 +77,7 @@ const CustomInput = React.forwardRef<
             rules={rules}
             render={({ field }) => {
               const { ref: _, value = "", ...fieldProps } = field;
+              const inputValue = type === 'number' && value === '' ? '' : value;
 
               const { error: _error, control: _c, ...cleanProps } = props;
 
@@ -94,7 +87,7 @@ const CustomInput = React.forwardRef<
                     {...fieldProps}
                     {...cleanProps}
                     id={name}
-                    value={value || ""}
+                    value={inputValue ?? ""}
                     onChange={field.onChange}
                     onBlur={field.onBlur}
                     className={cn(
@@ -112,7 +105,7 @@ const CustomInput = React.forwardRef<
                   {...cleanProps}
                   type={type}
                   id={name}
-                  value={value || ""}
+                  value={field.value ?? ""}
                   onChange={field.onChange}
                   onBlur={field.onBlur}
                   className={cn(
@@ -127,27 +120,21 @@ const CustomInput = React.forwardRef<
         );
       } else {
         // Render without react-hook-form
+        const commonProps = {
+          ...props,
+          id: name,
+          className: cn(className),
+          value: type === 'number' && (props.value === null || props.value === undefined) ? '' : props.value ?? "",
+          onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+            props.onChange?.(e);
+          },
+        };
+
         if (type === "textarea") {
-          return (
-            <Textarea
-              {...props}
-              id={name}
-              value={value}
-              onChange={handleChange}
-              className={cn(className)}
-              ref={ref as React.Ref<HTMLTextAreaElement>}
-            />
-          );
+          return <Textarea {...commonProps} ref={ref as React.Ref<HTMLTextAreaElement>} />;
         }
-        return (
-          <Input
-            id={name}
-            type={type}
-            {...props}
-            className={className}
-            ref={ref as React.Ref<HTMLInputElement>}
-          />
-        );
+        
+        return <Input type={type} {...commonProps} ref={ref as React.Ref<HTMLInputElement>} />;
       }
     };
 
