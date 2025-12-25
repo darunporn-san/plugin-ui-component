@@ -13,30 +13,26 @@ const external = [
   'date-fns',
   'lucide-react',
   'react-hook-form',
+  'sweetalert2',
 ];
 
 const config: Options = {
   entry: ['src/index.ts'],
   dts: {
     resolve: true,
-    // Only generate types for the ESM build
     entry: 'src/index.ts',
   },
-  format: ['esm', 'cjs'],
+  format: ['esm'], // Only ESM for smaller bundle size
   minify: 'terser',
-  sourcemap: false, // Disable sourcemaps in production
+  sourcemap: false,
   clean: true,
   tsconfig: './tsconfig.json',
   outDir: 'dist',
   target: 'es2020',
-  external,
-  // Enable better tree-shaking and code splitting
+  external: [...external, ...Object.keys(require('./package.json').peerDependencies || {})],
   splitting: true,
-  // Minify identifiers for production
   minifyIdentifiers: true,
-  // Minify syntax
   minifySyntax: true,
-  // Minify whitespace
   minifyWhitespace: true,
   // Configure esbuild for better TypeScript support and optimization
   esbuildOptions: (options) => {
@@ -44,10 +40,14 @@ const config: Options = {
       ...options.alias,
       '@': path.resolve(__dirname, 'src'),
     };
-    // Enable tree-shaking
+    // Enable tree-shaking and minification
     options.treeShaking = true;
-    // Enable minification
     options.minify = true;
+    options.define = {
+      'process.env.NODE_ENV': '"production"',
+    };
+    // Enable better code splitting
+    options.splitting = true;
   },
 };
 
